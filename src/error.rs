@@ -1,8 +1,4 @@
-use crate::{
-	Year,
-	Month,
-	YearMonth,
-};
+use crate::{Month, Year, YearMonth};
 
 /// The string is not a valid date.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -14,14 +10,12 @@ pub enum DateParseError {
 /// The string does not follow the proper date syntax.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDateSyntax {
-	_private: ()
+	_private: (),
 }
 
 impl InvalidDateSyntax {
 	pub fn new() -> Self {
-		Self {
-			_private: (),
-		}
+		Self { _private: () }
 	}
 }
 

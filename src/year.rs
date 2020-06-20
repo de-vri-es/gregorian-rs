@@ -1,11 +1,4 @@
-use crate::{
-	Date,
-	December,
-	January,
-	Month,
-	YearMonth,
-	InvalidDayOfYear,
-};
+use crate::{Date, December, InvalidDayOfYear, January, Month, YearMonth};
 
 /// A calendar year.
 ///

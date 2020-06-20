@@ -1,15 +1,7 @@
-use crate::{
-	Month,
-	Year,
-	YearMonth,
-	InvalidDate,
-	InvalidDateSyntax,
-	DateParseError,
-	util::Modulo,
-};
+use crate::{util::Modulo, DateParseError, InvalidDate, InvalidDateSyntax, Month, Year, YearMonth};
 
 /// The total number of days in 400 years.
-const DAYS_IN_400_YEAR : i32 = 400 * 365 + 97;
+const DAYS_IN_400_YEAR: i32 = 400 * 365 + 97;
 
 /// The number of days since year 0 for 1970-01-01.
 const UNIX_EPOCH: i32 = DAYS_IN_400_YEAR * 4 + 370 * 365 + 90;
@@ -139,10 +131,7 @@ impl Date {
 		// But -1 in leap years because they're taken care of in self.day_of_year().
 		let leap_days = leap_days - if self.year.has_leap_day() { 1 } else { 0 };
 
-		let from_years = 0
-			+ i32::from(whole_cycles) * DAYS_IN_400_YEAR
-			+ i32::from(years) * 365
-			+ i32::from(leap_days);
+		let from_years = i32::from(whole_cycles) * DAYS_IN_400_YEAR + i32::from(years) * 365 + i32::from(leap_days);
 
 		from_years + i32::from(self.day_of_year()) - 1
 	}
@@ -150,6 +139,7 @@ impl Date {
 	/// Get the date corresponding to a number of days since the year zero.
 	///
 	/// For this function, day 0 is 1 January 0000.
+	#[rustfmt::skip]
 	pub fn from_days_since_year_zero(days: i32) -> Self {
 		// Get the day index in the current 400 year cycle,
 		// and the number of passed 400 year cycles.
@@ -157,15 +147,16 @@ impl Date {
 		let whole_cycles = (days - day_index) / DAYS_IN_400_YEAR;
 
 		// How many leaps days did not happen at year 100, 200 and 300?
-		let pretend_leap_days = if day_index >= 300 * 365 + 73 + 31 + 29 {
-			3
+		let pretend_leap_days;
+		if day_index >= 300 * 365 + 73 + 31 + 29 {
+			pretend_leap_days = 3;
 		} else if day_index >= 200 * 365 + 49 + 31 + 29 {
-			2
+			pretend_leap_days = 2;
 		} else if day_index >= 100 * 365 + 25 + 31 + 29 {
-			1
+			pretend_leap_days = 1;
 		} else {
-			0
-		};
+			pretend_leap_days = 0;
+		}
 
 		// How many four year intervals passed, and how many days since then?
 		let four_year_cycles       = (day_index + pretend_leap_days) / (4 * 365 + 1);
@@ -237,9 +228,9 @@ impl core::str::FromStr for Date {
 		let day = fields.next().ok_or_else(InvalidDateSyntax::new)?;
 
 		// Parse fields as numbers.
-		let year : i16 = year.parse().map_err(|_| InvalidDateSyntax::new())?;
-		let month : u8 = month.parse().map_err(|_| InvalidDateSyntax::new())?;
-		let day : u8 = day.parse().map_err(|_| InvalidDateSyntax::new())?;
+		let year: i16 = year.parse().map_err(|_| InvalidDateSyntax::new())?;
+		let month: u8 = month.parse().map_err(|_| InvalidDateSyntax::new())?;
+		let day: u8 = day.parse().map_err(|_| InvalidDateSyntax::new())?;
 
 		// Return date.
 		Ok(Self::new(year, month, day)?)
@@ -284,10 +275,10 @@ mod test {
 		assert!(Date::new(2019, 3, 1).unwrap().day_of_year() == 60);
 		assert!(Date::new(2019, 4, 1).unwrap().day_of_year() == 91);
 		assert!(Date::new(2019, 5, 1).unwrap().day_of_year() == 121);
-		assert!(Date::new(2019, 6 , 1).unwrap().day_of_year() == 152);
-		assert!(Date::new(2019, 7 , 1).unwrap().day_of_year() == 182);
-		assert!(Date::new(2019, 8 , 1).unwrap().day_of_year() == 213);
-		assert!(Date::new(2019, 9 , 1).unwrap().day_of_year() == 244);
+		assert!(Date::new(2019, 6, 1).unwrap().day_of_year() == 152);
+		assert!(Date::new(2019, 7, 1).unwrap().day_of_year() == 182);
+		assert!(Date::new(2019, 8, 1).unwrap().day_of_year() == 213);
+		assert!(Date::new(2019, 9, 1).unwrap().day_of_year() == 244);
 		assert!(Date::new(2019, 10, 1).unwrap().day_of_year() == 274);
 		assert!(Date::new(2019, 11, 1).unwrap().day_of_year() == 305);
 		assert!(Date::new(2019, 12, 1).unwrap().day_of_year() == 335);
@@ -297,10 +288,10 @@ mod test {
 		assert!(Date::new(2020, 3, 1).unwrap().day_of_year() == 61);
 		assert!(Date::new(2020, 4, 1).unwrap().day_of_year() == 92);
 		assert!(Date::new(2020, 5, 1).unwrap().day_of_year() == 122);
-		assert!(Date::new(2020, 6 , 1).unwrap().day_of_year() == 153);
-		assert!(Date::new(2020, 7 , 1).unwrap().day_of_year() == 183);
-		assert!(Date::new(2020, 8 , 1).unwrap().day_of_year() == 214);
-		assert!(Date::new(2020, 9 , 1).unwrap().day_of_year() == 245);
+		assert!(Date::new(2020, 6, 1).unwrap().day_of_year() == 153);
+		assert!(Date::new(2020, 7, 1).unwrap().day_of_year() == 183);
+		assert!(Date::new(2020, 8, 1).unwrap().day_of_year() == 214);
+		assert!(Date::new(2020, 9, 1).unwrap().day_of_year() == 245);
 		assert!(Date::new(2020, 10, 1).unwrap().day_of_year() == 275);
 		assert!(Date::new(2020, 11, 1).unwrap().day_of_year() == 306);
 		assert!(Date::new(2020, 12, 1).unwrap().day_of_year() == 336);
@@ -341,8 +332,8 @@ mod test {
 		assert!(Date::from_days_since_year_zero(0) == Date::new(0, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(1 * (400 * 365 + 97)) == Date::new(400, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(2 * (400 * 365 + 97)) == Date::new(800, 1, 1).unwrap());
-		assert!(Date::from_days_since_year_zero(-1 * (400 * 365 + 97)) ==Date::new(-400, 1, 1).unwrap());
-		assert!(Date::from_days_since_year_zero(-2 * (400 * 365 + 97)) ==Date::new(-800, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(-1 * (400 * 365 + 97)) == Date::new(-400, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(-2 * (400 * 365 + 97)) == Date::new(-800, 1, 1).unwrap());
 
 		assert!(Date::from_days_since_year_zero(366) == Date::new(1, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(365) == Date::new(0, 12, 31).unwrap());
@@ -354,13 +345,13 @@ mod test {
 		assert!(Date::from_days_since_year_zero(-2 * 365) == Date::new(-2, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-3 * 365) == Date::new(-3, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-4 * 365 - 1) == Date::new(-4, 1, 1).unwrap());
-		assert!(Date::from_days_since_year_zero( 366) == Date::new(1, 1, 1).unwrap());
-		assert!(Date::from_days_since_year_zero( 100 * 365 + 25 + 31 + 27) == Date::new(100, 2, 28).unwrap());
-		assert!(Date::from_days_since_year_zero( 100 * 365 + 25 + 31 + 28) == Date::new(100, 3, 1).unwrap());
-		assert!(Date::from_days_since_year_zero( 101 * 365 + 25) == Date::new(101, 1, 1).unwrap());
-		assert!(Date::from_days_since_year_zero( 100 * 365 + 25 + 31 + 28) == Date::new(100, 3, 1).unwrap());
-		assert!(Date::from_days_since_year_zero( 200 * 365 + 49) == Date::new(200, 1, 1).unwrap());
-		assert!(Date::from_days_since_year_zero( 300 * 365 + 73) == Date::new(300, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(366) == Date::new(1, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 27) == Date::new(100, 2, 28).unwrap());
+		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 28) == Date::new(100, 3, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(101 * 365 + 25) == Date::new(101, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 28) == Date::new(100, 3, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(200 * 365 + 49) == Date::new(200, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(300 * 365 + 73) == Date::new(300, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-100 * 365 - 24) == Date::new(-100, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-400 * 365 - 97) == Date::new(-400, 1, 1).unwrap());
 

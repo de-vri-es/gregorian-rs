@@ -1,23 +1,8 @@
-use crate::{
-	InvalidMonthNumber,
-	Year,
-	YearMonth,
-};
+use crate::{InvalidMonthNumber, Year, YearMonth};
 
 /// All months in order as array.
 pub const MONTHS: [Month; 12] = [
-	January,
-	February,
-	March,
-	April,
-	May,
-	June,
-	July,
-	August,
-	September,
-	October,
-	November,
-	December,
+	January, February, March, April, May, June, July, August, September, October, November, December,
 ];
 
 /// A month on the Gregorian calendar.
@@ -85,9 +70,7 @@ impl Month {
 	pub fn wrapping_add(self, count: u8) -> Self {
 		let index = self.to_number() - 1;
 		let index = index.wrapping_add(count) % 12;
-		unsafe {
-			Self::new_unchecked(index + 1)
-		}
+		unsafe { Self::new_unchecked(index + 1) }
 	}
 
 	/// Add a number of months, wrapping back to December after January.

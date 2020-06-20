@@ -1,9 +1,4 @@
-use crate::{
-	Date,
-	InvalidDayOfMonth,
-	Month,
-	Year,
-};
+use crate::{Date, InvalidDayOfMonth, Month, Year};
 
 /// A month of a specific year.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -37,7 +32,13 @@ impl YearMonth {
 	pub fn total_days(self) -> u8 {
 		match self.month {
 			Month::January => 31,
-			Month::February => if self.year.has_leap_day() { 29 } else { 28 },
+			Month::February => {
+				if self.year.has_leap_day() {
+					29
+				} else {
+					28
+				}
+			}
 			Month::March => 31,
 			Month::April => 30,
 			Month::May => 31,
@@ -97,9 +98,7 @@ impl YearMonth {
 	/// Combine the year and month with a day, to create a full [`Date`].
 	pub fn with_day(self, day: u8) -> Result<Date, InvalidDayOfMonth> {
 		InvalidDayOfMonth::check(self.year, self.month, day)?;
-		unsafe {
-			Ok(Date::new_unchecked(self.year, self.month, day))
-		}
+		unsafe { Ok(Date::new_unchecked(self.year, self.month, day)) }
 	}
 
 	/// Combine the year and month with a day, without checking for validity.
