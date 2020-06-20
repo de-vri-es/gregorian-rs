@@ -3,6 +3,13 @@ name = "gregorian"
 version = "0.1.0"
 license = "BSD-2-Clause"
 authors = ["Maarten de Vries <maarten@de-vri.es>"]
+repository = "https://github.com/de-vri-es/gregorian-rs"
+documentation = "https://docs.rs/gregorian"
+
+description = "easy to use date library"
+keywords = ["date", "calendar", "gregorian", "proleptic"]
+categories = ["date-and-time", "no-std"]
+
 edition = "2018"
 
 [features]
