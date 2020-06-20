@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 //! An implementation of the proleptic Gregorian calendar.
 //! In this implementation, before the year 1 come year 0.
 //! The library does not deal with times.

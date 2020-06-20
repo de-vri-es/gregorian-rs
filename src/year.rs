@@ -146,12 +146,12 @@ impl PartialEq<i16> for Year {
 }
 
 impl PartialOrd<i16> for Year {
-	fn partial_cmp(&self, other: &i16) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, other: &i16) -> Option<core::cmp::Ordering> {
 		Some(self.to_number().cmp(other))
 	}
 }
 
-impl std::ops::Add<i16> for Year {
+impl core::ops::Add<i16> for Year {
 	type Output = Self;
 
 	fn add(self, other: i16) -> Self {
@@ -159,7 +159,7 @@ impl std::ops::Add<i16> for Year {
 	}
 }
 
-impl std::ops::Sub<i16> for Year {
+impl core::ops::Sub<i16> for Year {
 	type Output = Self;
 
 	fn sub(self, other: i16) -> Self {
@@ -167,20 +167,20 @@ impl std::ops::Sub<i16> for Year {
 	}
 }
 
-impl std::ops::AddAssign<i16> for Year {
+impl core::ops::AddAssign<i16> for Year {
 	fn add_assign(&mut self, other: i16) {
 		self.year += other
 	}
 }
 
-impl std::ops::SubAssign<i16> for Year {
+impl core::ops::SubAssign<i16> for Year {
 	fn sub_assign(&mut self, other: i16) {
 		self.year -= other
 	}
 }
 
-impl std::fmt::Display for Year {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for Year {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "{:04}", self.year)
 	}
 }

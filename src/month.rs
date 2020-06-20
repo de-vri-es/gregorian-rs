@@ -64,7 +64,7 @@ impl Month {
 
 	/// Create a new month from a month number, without checking for validity.
 	pub unsafe fn new_unchecked(month: u8) -> Self {
-		std::mem::transmute(month)
+		core::mem::transmute(month)
 	}
 
 	/// Get the month number in the range 1-12.
@@ -102,7 +102,7 @@ impl Month {
 	}
 }
 
-impl std::convert::TryFrom<u8> for Month {
+impl core::convert::TryFrom<u8> for Month {
 	type Error = InvalidMonthNumber;
 
 	fn try_from(other: u8) -> Result<Self, Self::Error> {
@@ -122,8 +122,8 @@ impl PartialEq<u8> for Month {
 	}
 }
 
-impl std::fmt::Display for Month {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for Month {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		// Delegate to Debug.
 		write!(f, "{:?}", self)
 	}

@@ -31,7 +31,7 @@ impl Date {
 	pub fn new<Y, M>(year: Y, month: M, day: u8) -> Result<Self, InvalidDate>
 	where
 		Y: Into<Year>,
-		M: std::convert::TryInto<Month>,
+		M: core::convert::TryInto<Month>,
 		InvalidDate: From<M::Error>,
 	{
 		let year_month = YearMonth::new(year, month.try_into()?);
@@ -222,28 +222,28 @@ impl Date {
 	}
 }
 
-impl std::str::FromStr for Date {
+impl core::str::FromStr for Date {
 	type Err = DateParseError;
 
 	fn from_str(data: &str) -> Result<Self, Self::Err> {
 		// Extract fields.
 		let mut fields = data.splitn(3, '-');
 		let year = fields.next().unwrap();
-		let month = fields.next().ok_or_else(|| InvalidDateSyntax::new(data))?;
-		let day = fields.next().ok_or_else(|| InvalidDateSyntax::new(data))?;
+		let month = fields.next().ok_or_else(InvalidDateSyntax::new)?;
+		let day = fields.next().ok_or_else(InvalidDateSyntax::new)?;
 
 		// Parse fields as numbers.
-		let year : i16 = year.parse().map_err(|_| InvalidDateSyntax::new(data))?;
-		let month : u8 = month.parse().map_err(|_| InvalidDateSyntax::new(data))?;
-		let day : u8 = day.parse().map_err(|_| InvalidDateSyntax::new(data))?;
+		let year : i16 = year.parse().map_err(|_| InvalidDateSyntax::new())?;
+		let month : u8 = month.parse().map_err(|_| InvalidDateSyntax::new())?;
+		let day : u8 = day.parse().map_err(|_| InvalidDateSyntax::new())?;
 
 		// Return date.
 		Ok(Self::new(year, month, day)?)
 	}
 }
 
-impl std::fmt::Display for Date {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for Date {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "{:04}-{:02}-{:02}", self.year.to_number(), self.month.to_number(), self.day)
 	}
 }

@@ -14,12 +14,14 @@ pub enum DateParseError {
 /// The string does not follow the proper date syntax.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDateSyntax {
-	pub data: String,
+	_private: ()
 }
 
 impl InvalidDateSyntax {
-	pub fn new(data: impl Into<String>) -> Self {
-		Self { data: data.into() }
+	pub fn new() -> Self {
+		Self {
+			_private: (),
+		}
 	}
 }
 
@@ -30,8 +32,8 @@ pub enum InvalidDate {
 	InvalidDayForMonth(InvalidDayOfMonth),
 }
 
-impl From<std::convert::Infallible> for InvalidDate {
-	fn from(_: std::convert::Infallible) -> Self {
+impl From<core::convert::Infallible> for InvalidDate {
+	fn from(_: core::convert::Infallible) -> Self {
 		unreachable!()
 	}
 }
@@ -91,15 +93,19 @@ impl From<InvalidDayOfMonth> for InvalidDate {
 	}
 }
 
-impl std::error::Error for DateParseError {}
-impl std::error::Error for InvalidDateSyntax {}
-impl std::error::Error for InvalidDate {}
-impl std::error::Error for InvalidMonthNumber {}
-impl std::error::Error for InvalidDayOfMonth {}
-impl std::error::Error for InvalidDayOfYear {}
+#[cfg(feature = "std")]
+mod std_support {
+	use super::*;
+	impl std::error::Error for DateParseError {}
+	impl std::error::Error for InvalidDateSyntax {}
+	impl std::error::Error for InvalidDate {}
+	impl std::error::Error for InvalidMonthNumber {}
+	impl std::error::Error for InvalidDayOfMonth {}
+	impl std::error::Error for InvalidDayOfYear {}
+}
 
-impl std::fmt::Display for DateParseError {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for DateParseError {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		match self {
 			Self::InvalidDateSyntax(e) => write!(f, "{}", e),
 			Self::InvalidDate(e) => write!(f, "{}", e),
@@ -107,14 +113,14 @@ impl std::fmt::Display for DateParseError {
 	}
 }
 
-impl std::fmt::Display for InvalidDateSyntax {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		write!(f, "invalid date syntax: expected \"YYYY-MM-DD\", got {:?}", self.data)
+impl core::fmt::Display for InvalidDateSyntax {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+		write!(f, "invalid date syntax: expected \"YYYY-MM-DD\"")
 	}
 }
 
-impl std::fmt::Display for InvalidDate {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for InvalidDate {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		match self {
 			Self::InvalidMonthNumber(e) => write!(f, "{}", e),
 			Self::InvalidDayForMonth(e) => write!(f, "{}", e),
@@ -122,14 +128,14 @@ impl std::fmt::Display for InvalidDate {
 	}
 }
 
-impl std::fmt::Display for InvalidMonthNumber {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for InvalidMonthNumber {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "invalid month number: expected 1-12, got {}", self.number)
 	}
 }
 
-impl std::fmt::Display for InvalidDayOfMonth {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for InvalidDayOfMonth {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(
 			f,
 			"invalid day for {} {}: expected 1-{}, got {}",
@@ -141,8 +147,8 @@ impl std::fmt::Display for InvalidDayOfMonth {
 	}
 }
 
-impl std::fmt::Display for InvalidDayOfYear {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for InvalidDayOfYear {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(
 			f,
 			"invalid day for of year for {}: expected 1-{}, got {}",
