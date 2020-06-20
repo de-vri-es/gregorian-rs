@@ -60,6 +60,16 @@ impl Date {
 		Self::from_days_since_year_zero(UNIX_EPOCH + days as i32)
 	}
 
+	/// Get the unix timestamp for a date.
+	///
+	/// The timestamp is the number of seconds since 1 January 1970 00:00.
+	///
+	/// The returned timestamp is valid for time 00:00 of the date.
+	pub fn to_unix_timestamp(self) -> i64 {
+		let days = self.days_since_year_zero() - UNIX_EPOCH;
+		60 * 60 * 24 * i64::from(days)
+	}
+
 	/// Get the year.
 	pub fn year(self) -> Year {
 		self.year
@@ -405,5 +415,13 @@ mod test {
 		assert!(Date::from_unix_timestamp(1592611200) == Date::new(2020, 06, 20).unwrap());
 		assert!(Date::from_unix_timestamp(1592697599) == Date::new(2020, 06, 20).unwrap());
 		assert!(Date::from_unix_timestamp(1592697600) == Date::new(2020, 06, 21).unwrap());
+	}
+
+	#[test]
+	fn test_to_unix_timestamp() {
+		const SECONDS_IN_DAY: i64 = 60 * 60 * 24;
+		assert!(Date::new(1970, 1, 1).unwrap().to_unix_timestamp() == 0);
+		assert!(Date::new(1970, 1, 2).unwrap().to_unix_timestamp() == SECONDS_IN_DAY);
+		assert!(Date::new(2020, 06, 20).unwrap().to_unix_timestamp() == 1592611200);
 	}
 }
