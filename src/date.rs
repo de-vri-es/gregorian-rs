@@ -11,6 +11,9 @@ use crate::{
 const DAYS_IN_400_YEAR : i32 = 400 * 365 + 97;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+/// A calendar date consting of a year, month and day.
+///
+/// All dates in the library use the proleptic Gregorian calendar with a year 0.
 pub struct Date {
 	pub(crate) year: Year,
 	pub(crate) month: Month,
@@ -18,6 +21,9 @@ pub struct Date {
 }
 
 impl Date {
+	/// Create a new date from a year, month and day.
+	///
+	/// Month and day numbers start at 1.
 	pub fn new<Y, M>(year: Y, month: M, day: u8) -> Result<Self, InvalidDate>
 	where
 		Y: Into<Year>,
@@ -28,6 +34,9 @@ impl Date {
 		Ok(year_month.with_day(day)?)
 	}
 
+	/// Create a new date without checking the validity.
+	///
+	/// Month and day numbers start at 1.
 	pub unsafe fn new_unchecked(year: Year, month: Month, day: u8) -> Self {
 		Self { year, month, day }
 	}
@@ -47,22 +56,30 @@ impl Date {
 		Self::from_days_since_year_zero(days as i32)
 	}
 
+	/// Get the year.
 	pub fn year(self) -> Year {
 		self.year
 	}
 
+	/// Get the month.
 	pub fn month(self) -> Month {
 		self.month
 	}
 
+	/// Get the day of the month.
 	pub fn day(self) -> u8 {
 		self.day
 	}
 
+	/// Get the year and month as [`YearMonth`].
 	pub fn year_month(self) -> YearMonth {
 		YearMonth::new(self.year(), self.month())
 	}
 
+	/// Get the day of the year.
+	///
+	/// The returned number is 1-based.
+	/// For January 1, this function will return 1.
 	pub fn day_of_year(self) -> u16 {
 		let leap_day_this_year = if self.year.has_leap_day() { 1 } else { 0 };
 		let days_to_month_start = match self.month {
@@ -85,8 +102,8 @@ impl Date {
 
 	/// The number of days remaining in the year, including the current date.
 	///
-	/// On Janury 1 this will return 365 in a non-leap year or 366 in a leap year.
-	/// On December 31, this will return 1.
+	/// For Janury 1 this will return 365 in a non-leap year or 366 in a leap year.
+	/// For December 31, this will return 1.
 	pub fn days_remaining_in_year(self) -> u16 {
 		self.year.total_days() - self.day_of_year() + 1
 	}
@@ -154,6 +171,7 @@ impl Date {
 		year.with_day_of_year(day_of_year as u16).unwrap()
 	}
 
+	/// Get a [`Date`] object for the next day.
 	pub fn next(self) -> Date {
 		if self.day == self.year_month().total_days() {
 			self.year_month().next().first_day()
@@ -166,6 +184,7 @@ impl Date {
 		}
 	}
 
+	/// Get a [`Date`] object for the previous day.
 	pub fn prev(self) -> Date {
 		if self.day == 1 {
 			self.year_month().prev().last_day()
@@ -194,7 +213,7 @@ impl std::str::FromStr for Date {
 		let month : u8 = month.parse().map_err(|_| InvalidDateSyntax::new(data))?;
 		let day : u8 = day.parse().map_err(|_| InvalidDateSyntax::new(data))?;
 
-		// Construct date.
+		// Return date.
 		Ok(Self::new(year, month, day)?)
 	}
 }

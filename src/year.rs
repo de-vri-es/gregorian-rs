@@ -7,24 +7,37 @@ use crate::{
 	InvalidDayOfYear,
 };
 
+/// A calendar year.
+///
+/// All dates in the library use the proleptic Gregorian calendar with a year 0.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Year {
 	year: i16,
 }
 
 impl Year {
+	/// Create a new year from a number.
 	pub fn new(year: i16) -> Self {
 		Self { year }
 	}
 
+	/// Get the year number.
 	pub fn to_number(self) -> i16 {
 		self.year
 	}
 
+	/// Check if the year has a leap day.
+	///
+	/// In the proleptic Gregorian calendar with a year 0,
+	/// the year 0 has a leap day.
 	pub fn has_leap_day(self) -> bool {
 		self.year % 4 == 0 && (self.year % 100 != 0 || self.year % 400 == 0)
 	}
 
+	/// Get the total number of days in the year.
+	///
+	/// For leap years, this is 366.
+	/// For other years, this is 365.
 	pub fn total_days(self) -> u16 {
 		if self.has_leap_day() {
 			366
@@ -33,18 +46,24 @@ impl Year {
 		}
 	}
 
+	/// Get the next year.
 	pub fn next(self) -> Self {
 		self + 1
 	}
 
+	/// Get the previous year.
 	pub fn prev(self) -> Self {
 		self - 1
 	}
 
+	/// Combine the year with a month to create a [`YearMonth`].
 	pub fn with_month(self, month: Month) -> YearMonth {
 		YearMonth::new(self, month)
 	}
 
+	/// Combine the year with a day-of-year to create a [`Date`].
+	///
+	/// Day-of-year numbers start a 1 for January 1.
 	pub fn with_day_of_year(self, day: u16) -> Result<Date, InvalidDayOfYear> {
 		if day < 1 || day > self.total_days() {
 			return Err(InvalidDayOfYear { year: self, day });
@@ -61,14 +80,17 @@ impl Year {
 		unreachable!()
 	}
 
+	/// Get the first month of the year as [`YearMonth`].
 	pub fn first_month(self) -> YearMonth {
 		self.with_month(January)
 	}
 
+	/// Get the last month of the year as [`YearMonth`].
 	pub fn last_month(self) -> YearMonth {
 		self.with_month(December)
 	}
 
+	/// Get all months of the year as [`YearMonth`] array.
 	pub fn months(self) -> [YearMonth; 12] {
 		[
 			self.with_month(Month::January),
@@ -86,6 +108,7 @@ impl Year {
 		]
 	}
 
+	/// Get the first day of the year as [`Date`].
 	pub fn first_day(self) -> Date {
 		Date {
 			year: self,
@@ -94,6 +117,7 @@ impl Year {
 		}
 	}
 
+	/// Get the last day of the year as [`Date`].
 	pub fn last_day(self) -> Date {
 		Date {
 			year: self,

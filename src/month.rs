@@ -4,6 +4,7 @@ use crate::{
 	YearMonth,
 };
 
+/// All months in order as array.
 pub const MONTHS: [Month; 12] = [
 	January,
 	February,
@@ -19,6 +20,7 @@ pub const MONTHS: [Month; 12] = [
 	December,
 ];
 
+/// A month on the Gregorian calendar.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum Month {
@@ -39,6 +41,9 @@ pub enum Month {
 pub use Month::*;
 
 impl Month {
+	/// Create a new month from a month number.
+	///
+	/// The number must be in the range 1-12 (inclusive).
 	pub fn new(month: u8) -> Result<Self, InvalidMonthNumber> {
 		match month {
 			1 => Ok(Self::January),
@@ -57,18 +62,22 @@ impl Month {
 		}
 	}
 
+	/// Create a new month from a month number, without checking for validity.
 	pub unsafe fn new_unchecked(month: u8) -> Self {
 		std::mem::transmute(month)
 	}
 
+	/// Get the month number in the range 1-12.
 	pub fn to_number(self) -> u8 {
 		self as u8
 	}
 
+	/// Combine the month with a year to create a [`YearMonth`].
 	pub fn with_year(self, year: impl Into<Year>) -> YearMonth {
 		YearMonth::new(year, self)
 	}
 
+	/// Add a number of months, wrapping back to January after December.
 	pub fn wrapping_add(self, count: u8) -> Self {
 		let index = self.to_number() - 1;
 		let index = index.wrapping_add(count) % 12;
@@ -77,14 +86,17 @@ impl Month {
 		}
 	}
 
+	/// Add a number of months, wrapping back to December after January.
 	pub fn wrapping_sub(self, count: u8) -> Self {
 		self.wrapping_add(12 - count % 12)
 	}
 
+	/// Get the next month, wrapping back to January after December.
 	pub fn wrapping_next(self) -> Self {
 		self.wrapping_add(1)
 	}
 
+	/// Get the previous month, wrapping back to December after January.
 	pub fn wrapping_prev(self) -> Self {
 		self.wrapping_add(11)
 	}

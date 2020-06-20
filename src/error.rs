@@ -4,12 +4,14 @@ use crate::{
 	YearMonth,
 };
 
+/// The string is not a valid date.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DateParseError {
 	InvalidDateSyntax(InvalidDateSyntax),
 	InvalidDate(InvalidDate),
 }
 
+/// The string does not follow the proper date syntax.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDateSyntax {
 	pub data: String,
@@ -21,6 +23,7 @@ impl InvalidDateSyntax {
 	}
 }
 
+/// The date is not valid.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum InvalidDate {
 	InvalidMonthNumber(InvalidMonthNumber),
@@ -33,11 +36,13 @@ impl From<std::convert::Infallible> for InvalidDate {
 	}
 }
 
+/// The month number is not valid.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidMonthNumber {
 	pub number: u8,
 }
 
+/// The day is not valid for the year and month.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDayOfMonth {
 	pub year: Year,
@@ -45,6 +50,7 @@ pub struct InvalidDayOfMonth {
 	pub day: u8,
 }
 
+/// The day-of-year is not valid for the year.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDayOfYear {
 	pub year: Year,

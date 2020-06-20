@@ -5,6 +5,7 @@ use crate::{
 	Year,
 };
 
+/// A month of a specific year.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct YearMonth {
 	year: Year,
@@ -12,19 +13,27 @@ pub struct YearMonth {
 }
 
 impl YearMonth {
+	/// Create a new year-month.
 	pub fn new(year: impl Into<Year>, month: Month) -> Self {
 		let year = year.into();
 		Self { year, month }
 	}
 
+	/// Get the year.
 	pub fn year(self) -> Year {
 		self.year
 	}
 
+	/// Get the month as [`Month`].
 	pub fn month(self) -> Month {
 		self.month
 	}
 
+	/// Get the total number of days in the month.
+	///
+	/// This function accounts for leap-days,
+	/// so it reports 29 days for February of leap-years,
+	/// and 28 days for other years.
 	pub fn total_days(self) -> u8 {
 		match self.month {
 			Month::January => 31,
@@ -42,6 +51,9 @@ impl YearMonth {
 		}
 	}
 
+	/// Get the day-of-year on which the month starts.
+	///
+	/// Day-of-year numbers are 1-based.
 	pub fn day_of_year(self) -> u16 {
 		let leap_day_this_year = if self.year.has_leap_day() { 1 } else { 0 };
 		match self.month {
@@ -60,6 +72,9 @@ impl YearMonth {
 		}
 	}
 
+	/// Get the next month as [`YearMonth`].
+	///
+	/// After December, this function returns January of the next year.
 	pub fn next(self) -> Self {
 		if self.month == Month::December {
 			Self::new(self.year.next(), Month::January)
@@ -68,6 +83,9 @@ impl YearMonth {
 		}
 	}
 
+	/// Get the previous month as [`YearMonth`].
+	///
+	/// After January, this function returns December of the previous year.
 	pub fn prev(self) -> Self {
 		if self.month == Month::January {
 			Self::new(self.year.prev(), Month::December)
@@ -76,6 +94,7 @@ impl YearMonth {
 		}
 	}
 
+	/// Combine the year and month with a day, to create a full [`Date`].
 	pub fn with_day(self, day: u8) -> Result<Date, InvalidDayOfMonth> {
 		InvalidDayOfMonth::check(self.year, self.month, day)?;
 		unsafe {
@@ -83,10 +102,12 @@ impl YearMonth {
 		}
 	}
 
+	/// Combine the year and month with a day, without checking for validity.
 	pub unsafe fn with_day_unchecked(self, day: u8) -> Date {
 		Date::new_unchecked(self.year, self.month, day)
 	}
 
+	/// Get the first day of the month as [`Date`].
 	pub fn first_day(self) -> Date {
 		Date {
 			year: self.year,
@@ -95,6 +116,7 @@ impl YearMonth {
 		}
 	}
 
+	/// Get the last day of the month as [`Date`].
 	pub fn last_day(self) -> Date {
 		Date {
 			year: self.year,
