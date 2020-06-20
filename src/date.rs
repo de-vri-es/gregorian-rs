@@ -196,6 +196,16 @@ impl Date {
 			}
 		}
 	}
+
+	/// Compute a date by adding days.
+	pub fn add_days(self, days: i32) -> Self {
+		Self::from_days_since_year_zero(self.days_since_year_zero() + days)
+	}
+
+	/// Compute a date by subtracting days.
+	pub fn sub_days(self, days: i32) -> Self {
+		Self::from_days_since_year_zero(self.days_since_year_zero() - days)
+	}
 }
 
 impl std::str::FromStr for Date {
@@ -335,6 +345,39 @@ mod test {
 		assert!(Date::from_days_since_year_zero( 300 * 365 + 73) == Date::new(300, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-100 * 365 - 24) == Date::new(-100, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-400 * 365 - 97) == Date::new(-400, 1, 1).unwrap());
+	}
+
+	#[test]
+	fn test_add_days() {
+		assert!(Date::new(2020, 1, 1).unwrap().add_days(1) == Date::new(2020, 1, 2).unwrap());
+		assert!(Date::new(2020, 1, 1).unwrap().add_days(31) == Date::new(2020, 2, 1).unwrap());
+		assert!(Date::new(2020, 1, 1).unwrap().add_days(366) == Date::new(2021, 1, 1).unwrap());
+		assert!(Date::new(2020, 1, 1).unwrap().add_days(366 + 365) == Date::new(2022, 1, 1).unwrap());
+
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(100 * 365 + 24) == Date::new(2099, 12, 31).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(100 * 365 + 25) == Date::new(2100, 1, 1).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(100 * 365 + 26) == Date::new(2100, 1, 2).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(100 * 365 + 25 + 58) == Date::new(2100, 2, 28).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(100 * 365 + 25 + 59) == Date::new(2100, 3, 1).unwrap());
+
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(200 * 365 + 48) == Date::new(2199, 12, 31).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(200 * 365 + 49) == Date::new(2200, 1, 1).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(200 * 365 + 50) == Date::new(2200, 1, 2).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(200 * 365 + 49 + 58) == Date::new(2200, 2, 28).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(200 * 365 + 49 + 59) == Date::new(2200, 3, 1).unwrap());
+
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(300 * 365 + 73) == Date::new(2300, 1, 1).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(300 * 365 + 72) == Date::new(2299, 12, 31).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(300 * 365 + 74) == Date::new(2300, 1, 2).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(300 * 365 + 73 + 58) == Date::new(2300, 2, 28).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(300 * 365 + 73 + 59) == Date::new(2300, 3, 1).unwrap());
+
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 96) == Date::new(2399, 12, 31).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97) == Date::new(2400, 1, 1).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 98) == Date::new(2400, 1, 2).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97 + 58) == Date::new(2400, 2, 28).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97 + 59) == Date::new(2400, 2, 29).unwrap());
+		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97 + 60) == Date::new(2400, 3, 1).unwrap());
 	}
 
 	#[test]
