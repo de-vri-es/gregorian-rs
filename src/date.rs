@@ -8,7 +8,11 @@ use crate::{
 	util::Modulo,
 };
 
+/// The total number of days in 400 years.
 const DAYS_IN_400_YEAR : i32 = 400 * 365 + 97;
+
+/// The number of days since year 0 for 1970-01-01.
+const UNIX_EPOCH: i32 = DAYS_IN_400_YEAR * 4 + 370 * 365 + 90;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 /// A calendar date consting of a year, month and day.
@@ -43,17 +47,17 @@ impl Date {
 
 	/// Get the date for a unix timestamp.
 	///
-	/// The timestamp is interpreted as number of seconds since 1970,
+	/// The timestamp is interpreted as number of seconds since 1 January 1970 00:00,
 	/// not including any leap seconds.
-	pub fn from_unix_timestamp(seconds: isize) -> Self {
+	pub fn from_unix_timestamp(seconds: i64) -> Self {
 		let days = seconds / (24 * 3600);
-		let days = if seconds < 0 && seconds != days * 24 * 2600 {
+		let days = if seconds < 0 && seconds != days * 24 * 3600 {
 			days - 1
 		} else {
 			days
 		};
 
-		Self::from_days_since_year_zero(days as i32)
+		Self::from_days_since_year_zero(UNIX_EPOCH + days as i32)
 	}
 
 	/// Get the year.
@@ -345,6 +349,10 @@ mod test {
 		assert!(Date::from_days_since_year_zero( 300 * 365 + 73) == Date::new(300, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-100 * 365 - 24) == Date::new(-100, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(-400 * 365 - 97) == Date::new(-400, 1, 1).unwrap());
+
+		assert!(Date::from_days_since_year_zero(370 * 365 + 90) == Date::new(370, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(770 * 365 + 97 + 90) == Date::new(770, 1, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(UNIX_EPOCH) == Date::new(1970, 1, 1).unwrap());
 	}
 
 	#[test]
@@ -387,5 +395,15 @@ mod test {
 		assert!("2020-01-02".parse::<Date>().unwrap().day() == 2);
 		assert!(let Err(DateParseError::InvalidDateSyntax(_)) = "not-a-date".parse::<Date>());
 		assert!(let Err(DateParseError::InvalidDate(_)) = "2019-30-12".parse::<Date>());
+	}
+
+	#[test]
+	fn test_from_unix_timestamp() {
+		const SECONDS_IN_DAY: i64 = 60 * 60 * 24;
+		assert!(Date::from_unix_timestamp(0) == Date::new(1970, 1, 1).unwrap());
+		assert!(Date::from_unix_timestamp(SECONDS_IN_DAY) == Date::new(1970, 1, 2).unwrap());
+		assert!(Date::from_unix_timestamp(1592611200) == Date::new(2020, 06, 20).unwrap());
+		assert!(Date::from_unix_timestamp(1592697599) == Date::new(2020, 06, 20).unwrap());
+		assert!(Date::from_unix_timestamp(1592697600) == Date::new(2020, 06, 21).unwrap());
 	}
 }
