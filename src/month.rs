@@ -63,6 +63,10 @@ impl Month {
 	}
 
 	/// Create a new month from a month number, without checking for validity.
+	///
+	/// # Safety
+	/// The month number will be transmuted directly to [`Month`].
+	/// If the number is not a valid enum variant, this triggers undefined behaviour.
 	pub unsafe fn new_unchecked(month: u8) -> Self {
 		core::mem::transmute(month)
 	}

@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(clippy::new_without_default)]
 
 //! An implementation of the proleptic Gregorian calendar.
 //! In this implementation, before the year 1 come year 0.

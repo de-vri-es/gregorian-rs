@@ -103,6 +103,9 @@ impl YearMonth {
 	}
 
 	/// Combine the year and month with a day, without checking for validity.
+	///
+	/// # Safety
+	/// Although this is currently not the case, future implementations may rely on date validity for memory safety
 	pub unsafe fn with_day_unchecked(self, day: u8) -> Date {
 		Date::new_unchecked(self.year, self.month, day)
 	}

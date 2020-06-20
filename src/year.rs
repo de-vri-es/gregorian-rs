@@ -69,8 +69,7 @@ impl Year {
 			return Err(InvalidDayOfYear { year: self, day });
 		}
 
-		#[allow(array_into_iter)]
-		for month in self.months().into_iter().rev() {
+		for month in self.months().iter().rev() {
 			if day >= month.day_of_year() {
 				let day_of_month = (day - month.day_of_year()) as u8 + 1;
 				return Ok(unsafe { month.with_day_unchecked(day_of_month) });

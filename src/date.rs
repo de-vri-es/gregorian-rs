@@ -41,6 +41,9 @@ impl Date {
 	/// Create a new date without checking the validity.
 	///
 	/// Month and day numbers start at 1.
+	///
+	/// # Safety
+	/// Although this is currently not the case, future implementations may rely on date validity for memory safety
 	pub unsafe fn new_unchecked(year: Year, month: Month, day: u8) -> Self {
 		Self { year, month, day }
 	}
@@ -126,6 +129,7 @@ impl Date {
 	///
 	/// The returned value is zero-based.
 	/// For 1 January 0000, this function returns 0.
+	#[allow(clippy::identity_op)]
 	pub fn days_since_year_zero(self) -> i32 {
 		let years = ((self.year().to_number() % 400) + 400) % 400;
 		let whole_cycles = (self.year().to_number() - years) / 400;
