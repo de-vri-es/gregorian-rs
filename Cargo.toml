@@ -5,6 +5,7 @@ license = "BSD-2-Clause"
 authors = ["Maarten de Vries <maarten@de-vri.es>"]
 repository = "https://github.com/de-vri-es/gregorian-rs"
 documentation = "https://docs.rs/gregorian"
+readme = "README.md"
 
 description = "easy to use date library"
 keywords = ["date", "calendar", "gregorian", "proleptic"]
