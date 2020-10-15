@@ -4,6 +4,7 @@ Version 0.2.0:
   * Add `YearMonth::add/sub_years` and `YearMonth::add/sub_months`.
   * Add `Date::add/sub_years` and `Date::add/sub_months`.
   * Add `InvalidDayOfMonth::next/prev_valid()` to get the nearest valid date.
+  * Rename `InvalidDate::InvalidDayForMonth` to `InvalidDate::InvalidDayOfMonth` to match the wrapped struct.
 
 Version 0.1.1:
   * Fix `Date::add_days` for days in years 100, 200 and 300 of the 400 year cycle.

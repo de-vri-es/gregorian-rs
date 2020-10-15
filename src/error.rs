@@ -23,7 +23,7 @@ impl InvalidDateSyntax {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum InvalidDate {
 	InvalidMonthNumber(InvalidMonthNumber),
-	InvalidDayForMonth(InvalidDayOfMonth),
+	InvalidDayOfMonth(InvalidDayOfMonth),
 }
 
 impl From<core::convert::Infallible> for InvalidDate {
@@ -99,7 +99,7 @@ impl From<InvalidMonthNumber> for InvalidDate {
 
 impl From<InvalidDayOfMonth> for InvalidDate {
 	fn from(other: InvalidDayOfMonth) -> Self {
-		Self::InvalidDayForMonth(other)
+		Self::InvalidDayOfMonth(other)
 	}
 }
 
@@ -133,7 +133,7 @@ impl core::fmt::Display for InvalidDate {
 	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		match self {
 			Self::InvalidMonthNumber(e) => write!(f, "{}", e),
-			Self::InvalidDayForMonth(e) => write!(f, "{}", e),
+			Self::InvalidDayOfMonth(e) => write!(f, "{}", e),
 		}
 	}
 }
@@ -176,7 +176,7 @@ mod test {
 
 	#[test]
 	fn next_prev_valid() {
-		let_assert!(Err(InvalidDate::InvalidDayForMonth(e)) = Date::new(2020, April, 31));
+		let_assert!(Err(InvalidDate::InvalidDayOfMonth(e)) = Date::new(2020, April, 31));
 		assert!(e.next_valid() == Date::new(2020, May, 1).unwrap());
 		assert!(e.prev_valid() == Date::new(2020, April, 30).unwrap());
 	}
