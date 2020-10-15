@@ -67,15 +67,21 @@ impl Month {
 	}
 
 	/// Add a number of months, wrapping back to January after December.
-	pub fn wrapping_add(self, count: u8) -> Self {
-		let index = self.to_number() - 1;
-		let index = index.wrapping_add(count) % 12;
-		unsafe { Self::new_unchecked(index + 1) }
+	pub fn wrapping_add(self, count: i8) -> Self {
+		let count = if count < 0 {
+			(count % 12) + 12
+		} else {
+			count % 12
+		};
+		let index = (self.to_number() as i8 - 1 + count) % 12;
+		unsafe { Self::new_unchecked((index + 1) as u8) }
 	}
 
 	/// Add a number of months, wrapping back to December after January.
-	pub fn wrapping_sub(self, count: u8) -> Self {
-		self.wrapping_add(12 - count % 12)
+	pub fn wrapping_sub(self, count: i8) -> Self {
+		// Take remainder after dividing by 12 before negating,
+		// to prevent negating i8::MIN.
+		self.wrapping_add(-(count % 12))
 	}
 
 	/// Get the next month, wrapping back to January after December.
@@ -188,16 +194,31 @@ mod test {
 
 	#[test]
 	fn test_wrapping_add() {
+		assert!(January.wrapping_add(0) == January);
 		assert!(January.wrapping_add(1) == February);
 		assert!(January.wrapping_add(2) == March);
+		assert!(January.wrapping_add(12) == January);
 		assert!(January.wrapping_add(13) == February);
+
+		assert!(January.wrapping_add(-1) == December);
+		assert!(January.wrapping_add(-2) == November);
+		assert!(January.wrapping_add(-12) == January);
+		assert!(January.wrapping_add(-13) == December);
 	}
 
 	#[test]
 	fn test_wrapping_sub() {
+		assert!(January.wrapping_sub(0) == January);
 		assert!(January.wrapping_sub(1) == December);
 		assert!(January.wrapping_sub(2) == November);
+		assert!(January.wrapping_sub(12) == January);
 		assert!(January.wrapping_sub(13) == December);
+
+		assert!(January.wrapping_sub(-0) == January);
+		assert!(January.wrapping_sub(-1) == February);
+		assert!(January.wrapping_sub(-2) == March);
+		assert!(January.wrapping_sub(-12) == January);
+		assert!(January.wrapping_sub(-13) == February);
 	}
 
 	#[test]
