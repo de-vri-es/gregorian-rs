@@ -1,4 +1,4 @@
-use crate::{util::Modulo, DateParseError, InvalidDate, InvalidDateSyntax, Month, Year, YearMonth};
+use crate::{util::Modulo, DateParseError, InvalidDate, InvalidDayOfMonth, InvalidDateSyntax, Month, Year, YearMonth};
 
 /// The total number of days in 400 years.
 const DAYS_IN_400_YEAR: i32 = 400 * 365 + 97;
@@ -202,6 +202,42 @@ impl Date {
 	/// Compute a date by subtracting days.
 	pub fn sub_days(self, days: i32) -> Self {
 		Self::from_days_since_year_zero(self.days_since_year_zero() - days)
+	}
+
+	/// Compute a date by adding a number of months.
+	///
+	/// The resulting date may not be valid.
+	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
+	/// to get the first day of the next month or the last day of resulting month.
+	pub fn add_months(self, months: i32) -> Result<Self, InvalidDayOfMonth> {
+		self.year_month().add_months(months).with_day(self.day())
+	}
+
+	/// Compute a date by subtracting a number of months.
+	///
+	/// The resulting date may not be valid.
+	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
+	/// to get the first day of the next month or the last day of resulting month.
+	pub fn sub_months(self, months: i32) -> Result<Self, InvalidDayOfMonth> {
+		self.year_month().add_months(months).with_day(self.day())
+	}
+
+	/// Compute a date by adding a number of years.
+	///
+	/// The resulting date may not be valid.
+	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
+	/// to get the first day of the next month or the last day of resulting month.
+	pub fn add_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
+		self.year_month().add_years(years).with_day(self.day())
+	}
+
+	/// Compute a date by subtracting a number of years.
+	///
+	/// The resulting date may not be valid.
+	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
+	/// to get the first day of the next month or the last day of resulting month.
+	pub fn sub_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
+		self.year_month().add_years(years).with_day(self.day())
 	}
 }
 
@@ -411,6 +447,25 @@ mod test {
 		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97 + 58) == Date::new(2400, 2, 28).unwrap());
 		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97 + 59) == Date::new(2400, 2, 29).unwrap());
 		assert!(Date::new(2000, 1, 1).unwrap().add_days(400 * 365 + 97 + 60) == Date::new(2400, 3, 1).unwrap());
+	}
+
+	#[test]
+	fn test_add_years() {
+		assert!(Date::new(2020, 1, 1).unwrap().add_years(1).unwrap() == Date::new(2021, 1, 1).unwrap());
+		assert!(Date::new(2000, 2, 29).unwrap().add_years(400).unwrap() == Date::new(2400, 2, 29).unwrap());
+		assert!(Date::new(2000, 2, 29).unwrap().add_years(100).unwrap_err().prev_valid() == Date::new(2100, 2, 28).unwrap());
+		assert!(Date::new(2000, 2, 29).unwrap().add_years(100).unwrap_err().next_valid() == Date::new(2100, 3, 1).unwrap());
+	}
+
+	#[test]
+	fn test_add_months() {
+		assert!(Date::new(2021, 1, 31).unwrap().add_months(2).unwrap() == Date::new(2021, 3, 31).unwrap());
+		assert!(Date::new(2021, 1, 31).unwrap().add_months(1).unwrap_err().prev_valid() == Date::new(2021, 2, 28).unwrap());
+		assert!(Date::new(2021, 1, 31).unwrap().add_months(1).unwrap_err().next_valid() == Date::new(2021, 3, 1).unwrap());
+
+		assert!(Date::new(2021, 1, 31).unwrap().add_months(14).unwrap() == Date::new(2022, 3, 31).unwrap());
+		assert!(Date::new(2021, 1, 31).unwrap().add_months(13).unwrap_err().prev_valid() == Date::new(2022, 2, 28).unwrap());
+		assert!(Date::new(2021, 1, 31).unwrap().add_months(13).unwrap_err().next_valid() == Date::new(2022, 3, 1).unwrap());
 	}
 
 	#[test]
