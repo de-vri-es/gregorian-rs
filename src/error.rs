@@ -1,4 +1,4 @@
-use crate::{Month, Year, YearMonth};
+use crate::{Date, Month, Year, YearMonth};
 
 /// The string is not a valid date.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -39,7 +39,7 @@ pub struct InvalidMonthNumber {
 }
 
 /// The day is not valid for the year and month.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDayOfMonth {
 	pub year: Year,
 	pub month: Month,
@@ -60,6 +60,22 @@ impl InvalidDayOfMonth {
 		} else {
 			Ok(())
 		}
+	}
+
+	/// Get the next valid date.
+	///
+	/// This function returns the first day of the next month for the invalid date.
+	///
+	/// It does not add the excess days in the new month.
+	pub fn next_valid(self) -> Date {
+		self.year.with_month(self.month).next().first_day()
+	}
+
+	/// Get the last valid date before the invalid date.
+	///
+	/// This function returns the last day of the current month for the invalid date.
+	pub fn prev_valid(self) -> Date {
+		self.year.with_month(self.month).last_day()
 	}
 }
 
@@ -150,5 +166,18 @@ impl core::fmt::Display for InvalidDayOfYear {
 			self.year.total_days(),
 			self.day,
 		)
+	}
+}
+
+#[cfg(test)]
+mod test {
+	use crate::*;
+	use assert2::{assert, let_assert};
+
+	#[test]
+	fn next_prev_valid() {
+		let_assert!(Err(InvalidDate::InvalidDayForMonth(e)) = Date::new(2020, April, 31));
+		assert!(e.next_valid() == Date::new(2020, May, 1).unwrap());
+		assert!(e.prev_valid() == Date::new(2020, April, 30).unwrap());
 	}
 }
