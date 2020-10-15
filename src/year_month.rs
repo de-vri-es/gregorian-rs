@@ -62,6 +62,37 @@ impl YearMonth {
 		}
 	}
 
+	/// Get a new [`YearMonth`] by adding a number of years.
+	pub fn add_years(self, years: i16) -> Self {
+		(self.year() + years).with_month(self.month())
+	}
+
+	/// Get a new [`YearMonth`] by subtracting a number of years.
+	pub fn sub_years(self, years: i16) -> Self {
+		(self.year() - years).with_month(self.month())
+	}
+
+	/// Get a new [`YearMonth`] by adding a number of months.
+	pub fn add_months(self, months: i32) -> Self {
+		// Split calculation for years and months.
+		let months = i32::from(self.month().to_number() - 1) + months;
+		let mut year = self.year() + (months / 12) as i16;
+		let month = Month::January.wrapping_add((months % 12) as i8);
+
+		// If we subtract months, we must decrease the year too.
+		if months % 12 < 0 {
+			year -= 1;
+		}
+
+		year.with_month(month)
+	}
+
+	/// Get a new [`YearMonth`] by subtracting a number of months.
+	pub fn sub_months(self, months: i32) -> Self {
+		// This breaks for i32::MIN, but that would overflow the year counter anyway.
+		self.add_months(-months)
+	}
+
 	/// Combine the year and month with a day, to create a full [`Date`].
 	pub fn with_day(self, day: u8) -> Result<Date, InvalidDayOfMonth> {
 		InvalidDayOfMonth::check(self.year, self.month, day)?;
@@ -111,6 +142,37 @@ impl core::fmt::Debug for YearMonth {
 mod test {
 	use crate::*;
 	use assert2::assert;
+
+	#[test]
+	fn test_add_months() {
+		for i in -200..=200 {
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 1) == Year::new(2000 + i as i16).with_month(February));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 2) == Year::new(2000 + i as i16).with_month(March));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 3) == Year::new(2000 + i as i16).with_month(April));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 4) == Year::new(2000 + i as i16).with_month(May));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 5) == Year::new(2000 + i as i16).with_month(June));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 6) == Year::new(2000 + i as i16).with_month(July));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 7) == Year::new(2000 + i as i16).with_month(August));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 8) == Year::new(2000 + i as i16).with_month(September));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 9) == Year::new(2000 + i as i16).with_month(October));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 10) == Year::new(2000 + i as i16).with_month(November));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 11) == Year::new(2000 + i as i16).with_month(December));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 12) == Year::new(2001 + i as i16).with_month(January));
+
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -1) == Year::new(1999 + i as i16).with_month(December));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -2) == Year::new(1999 + i as i16).with_month(November));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -3) == Year::new(1999 + i as i16).with_month(October));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -4) == Year::new(1999 + i as i16).with_month(September));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -5) == Year::new(1999 + i as i16).with_month(August));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -6) == Year::new(1999 + i as i16).with_month(July));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -7) == Year::new(1999 + i as i16).with_month(June));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -8) == Year::new(1999 + i as i16).with_month(May));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -9) == Year::new(1999 + i as i16).with_month(April));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -10) == Year::new(1999 + i as i16).with_month(March));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -11) == Year::new(1999 + i as i16).with_month(February));
+			assert!(Year::new(2000).with_month(January).add_months(i * 12 + -12) == Year::new(1999 + i as i16).with_month(January));
+		}
+	}
 
 	#[test]
 	fn year_month_fmt() {
