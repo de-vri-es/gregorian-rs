@@ -30,6 +30,7 @@
 
 mod date;
 mod error;
+mod ext;
 mod month;
 mod raw;
 mod util;
@@ -38,6 +39,7 @@ mod year_month;
 
 pub use date::*;
 pub use error::*;
+pub use ext::*;
 pub use month::*;
 pub use year::*;
 pub use year_month::*;
