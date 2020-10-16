@@ -24,3 +24,16 @@ impl DateResultExt for Result<Date, InvalidDayOfMonth> {
 		self.unwrap_or_else(|e| e.prev_valid())
 	}
 }
+
+#[cfg(test)]
+mod test {
+	use super::*;
+	use assert2::assert;
+
+	#[test]
+	fn test_data_result_ext() {
+		assert!(Date::new(2020, 1, 31).unwrap().add_months(2).or_next_valid() == Date::new(2020, 3, 31).unwrap());
+		assert!(Date::new(2020, 1, 31).unwrap().add_months(1).or_next_valid() == Date::new(2020, 3, 1).unwrap());
+		assert!(Date::new(2020, 1, 31).unwrap().add_months(1).or_prev_valid() == Date::new(2020, 2, 29).unwrap());
+	}
+}
