@@ -50,7 +50,7 @@ pub struct InvalidDayOfMonth {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InvalidDayOfYear {
 	pub year: Year,
-	pub day: u16,
+	pub day_of_year: u16,
 }
 
 impl InvalidDayOfMonth {
@@ -164,7 +164,7 @@ impl core::fmt::Display for InvalidDayOfYear {
 			"invalid day for of year for {}: expected 1-{}, got {}",
 			self.year,
 			self.year.total_days(),
-			self.day,
+			self.day_of_year,
 		)
 	}
 }

@@ -59,7 +59,7 @@ impl Year {
 	/// Day-of-year numbers start a 1 for January 1.
 	pub fn with_day_of_year(self, day_of_year: u16) -> Result<Date, InvalidDayOfYear> {
 		let (month, day_of_month) = crate::raw::month_and_day_from_day_of_year(day_of_year, self.has_leap_day())
-			.map_err(|()| InvalidDayOfYear { year: self, day: day_of_year })?;
+			.map_err(|()| InvalidDayOfYear { year: self, day_of_year })?;
 
 		Ok(unsafe { self.with_month(month).with_day_unchecked(day_of_month) })
 	}
