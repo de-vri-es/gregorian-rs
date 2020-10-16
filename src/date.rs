@@ -6,7 +6,7 @@ const DAYS_IN_400_YEAR: i32 = 400 * 365 + 97;
 /// The number of days since year 0 for 1970-01-01.
 const UNIX_EPOCH: i32 = DAYS_IN_400_YEAR * 4 + 370 * 365 + 90;
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 /// A calendar date consting of a year, month and day.
 ///
 /// All dates in the library use the proleptic Gregorian calendar with a year 0.
@@ -231,6 +231,12 @@ impl core::fmt::Display for Date {
 	}
 }
 
+impl core::fmt::Debug for Date {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+		write!(f, "Date({})", self)
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -432,5 +438,11 @@ mod test {
 		assert!(Date::new(1970, 1, 1).unwrap().to_unix_timestamp() == 0);
 		assert!(Date::new(1970, 1, 2).unwrap().to_unix_timestamp() == SECONDS_IN_DAY);
 		assert!(Date::new(2020, 06, 20).unwrap().to_unix_timestamp() == 1592611200);
+	}
+
+	#[test]
+	fn date_fmt() {
+		assert!(format!("{}", Date::new(2020, Month::January, 2).unwrap()) == "2020-01-02");
+		assert!(format!("{:?}", Date::new(2020, Month::January, 2).unwrap()) == "Date(2020-01-02)");
 	}
 }

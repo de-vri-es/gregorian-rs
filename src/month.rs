@@ -199,4 +199,10 @@ mod test {
 		assert!(January.wrapping_sub(2) == November);
 		assert!(January.wrapping_sub(13) == December);
 	}
+
+	#[test]
+	fn month_fmt() {
+		assert!(format!("{}", January) == "January");
+		assert!(format!("{:?}", January) == "January");
+	}
 }

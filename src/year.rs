@@ -3,7 +3,7 @@ use crate::{Date, December, InvalidDayOfYear, January, Month, YearMonth};
 /// A calendar year.
 ///
 /// All dates in the library use the proleptic Gregorian calendar with a year 0.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Year {
 	year: i16,
 }
@@ -169,6 +169,12 @@ impl core::fmt::Display for Year {
 	}
 }
 
+impl core::fmt::Debug for Year {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+		write!(f, "Year({:04})", self.year)
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -180,5 +186,11 @@ mod test {
 		assert!(Year::new(2021).has_leap_day() == false);
 		assert!(Year::new(1900).has_leap_day() == false);
 		assert!(Year::new(2000).has_leap_day() == true);
+	}
+
+	#[test]
+	fn year_fmt() {
+		assert!(format!("{}", Year::new(2020)) == "2020");
+		assert!(format!("{:?}", Year::new(2020)) == "Year(2020)");
 	}
 }

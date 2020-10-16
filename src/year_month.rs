@@ -1,7 +1,7 @@
 use crate::{Date, InvalidDayOfMonth, Month, Year};
 
 /// A month of a specific year.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct YearMonth {
 	year: Year,
 	month: Month,
@@ -98,5 +98,23 @@ impl YearMonth {
 impl core::fmt::Display for YearMonth {
 	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "{:04}-{:02}", self.year.to_number(), self.month().to_number())
+	}
+}
+
+impl core::fmt::Debug for YearMonth {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+		write!(f, "YearMonth({})", self)
+	}
+}
+
+#[cfg(test)]
+mod test {
+	use crate::*;
+	use assert2::assert;
+
+	#[test]
+	fn year_month_fmt() {
+		assert!(format!("{}", Year::new(2020).with_month(January)) == "2020-01");
+		assert!(format!("{:?}", Year::new(2020).with_month(January)) == "YearMonth(2020-01)");
 	}
 }
