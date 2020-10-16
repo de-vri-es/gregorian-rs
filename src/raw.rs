@@ -37,7 +37,7 @@ pub const fn month_and_day_from_day_of_year(day_of_year: u16, leap_year: bool) -
 	}
 }
 
-/// Get the numbers of days in a month.
+/// Get the number of days in a month.
 pub const fn days_in_month(month: Month, leap_year: bool) -> u8 {
 	match month {
 		Month::January => 31,
