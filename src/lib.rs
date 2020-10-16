@@ -1,9 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::new_without_default)]
 
-//! An implementation of the proleptic Gregorian calendar.
-//! In this implementation, before the year 1 come year 0.
-//! The library does not deal with times.
+//! An implementation of the proleptic Gregorian calendar, compatible with ISO 8601.
+//! Amongst others, that means that the calendar has a year zero preceeding the year 1.
+//!
+//! This create does not deal with times or time zones.
 //!
 //! The [`Date`] type represents a date (year, month and day),
 //! the [`Year`] type represents a calendar year,

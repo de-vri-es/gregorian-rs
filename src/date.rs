@@ -122,7 +122,7 @@ impl Date {
 
 	/// Get the date corresponding to a number of days since the year zero.
 	///
-	/// For this function, day 0 is 1 January 0000.
+	/// For this function, day 0 is 1 January of year 0.
 	#[rustfmt::skip]
 	pub fn from_days_since_year_zero(days: i32) -> Self {
 		// Get the day index in the current 400 year cycle,
