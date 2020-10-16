@@ -57,19 +57,11 @@ impl Year {
 	/// Combine the year with a day-of-year to create a [`Date`].
 	///
 	/// Day-of-year numbers start a 1 for January 1.
-	pub fn with_day_of_year(self, day: u16) -> Result<Date, InvalidDayOfYear> {
-		if day < 1 || day > self.total_days() {
-			return Err(InvalidDayOfYear { year: self, day });
-		}
+	pub fn with_day_of_year(self, day_of_year: u16) -> Result<Date, InvalidDayOfYear> {
+		let (month, day_of_month) = crate::raw::month_and_day_from_day_of_year(day_of_year, self.has_leap_day())
+			.map_err(|()| InvalidDayOfYear { year: self, day: day_of_year })?;
 
-		for month in self.months().iter().rev() {
-			if day >= month.day_of_year() {
-				let day_of_month = (day - month.day_of_year()) as u8 + 1;
-				return Ok(unsafe { month.with_day_unchecked(day_of_month) });
-			}
-		}
-
-		unreachable!()
+		Ok(unsafe { self.with_month(month).with_day_unchecked(day_of_month) })
 	}
 
 	/// Get the first month of the year as [`YearMonth`].

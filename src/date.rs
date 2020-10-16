@@ -90,23 +90,7 @@ impl Date {
 	/// The returned number is 1-based.
 	/// For January 1, this function will return 1.
 	pub fn day_of_year(self) -> u16 {
-		let leap_day_this_year = if self.year.has_leap_day() { 1 } else { 0 };
-		let days_to_month_start = match self.month {
-			Month::January => 0,
-			Month::February => 31,
-			Month::March => 59 + leap_day_this_year,
-			Month::April => 90 + leap_day_this_year,
-			Month::May => 120 + leap_day_this_year,
-			Month::June => 151 + leap_day_this_year,
-			Month::July => 181 + leap_day_this_year,
-			Month::August => 212 + leap_day_this_year,
-			Month::September => 243 + leap_day_this_year,
-			Month::October => 273 + leap_day_this_year,
-			Month::November => 304 + leap_day_this_year,
-			Month::December => 334 + leap_day_this_year,
-		};
-
-		days_to_month_start + u16::from(self.day)
+		crate::raw::day_of_year(self.month, self.day, self.year.has_leap_day())
 	}
 
 	/// The number of days remaining in the year, including the current date.
@@ -148,11 +132,11 @@ impl Date {
 
 		// How many leaps days did not happen at year 100, 200 and 300?
 		let pretend_leap_days;
-		if day_index >= 300 * 365 + 73 + 31 + 29 {
+		if day_index >= 300 * 365 + 73 + 31 + 28 {
 			pretend_leap_days = 3;
-		} else if day_index >= 200 * 365 + 49 + 31 + 29 {
+		} else if day_index >= 200 * 365 + 49 + 31 + 28 {
 			pretend_leap_days = 2;
-		} else if day_index >= 100 * 365 + 25 + 31 + 29 {
+		} else if day_index >= 100 * 365 + 25 + 31 + 28 {
 			pretend_leap_days = 1;
 		} else {
 			pretend_leap_days = 0;
@@ -177,7 +161,11 @@ impl Date {
 		// Put it all together.
 		let year = 400 * whole_cycles + 4 * four_year_cycles + year_of_four_year_cycle;
 		let year = Year::new(year as i16);
-		year.with_day_of_year(day_of_year as u16).unwrap()
+
+		// Lie about leap years for year 100, 200 and 300 because we added pretend leaps days.
+		let (month, day_of_month) = crate::raw::month_and_day_from_day_of_year(day_of_year as u16, year_of_four_year_cycle == 0).unwrap();
+
+		unsafe { year.with_month(month).with_day_unchecked(day_of_month) }
 	}
 
 	/// Get a [`Date`] object for the next day.
@@ -325,6 +313,18 @@ mod test {
 		assert!(Date::new(-4, 1, 1).unwrap().days_since_year_zero() == -4 * 365 - 1);
 		assert!(Date::new(-100, 1, 1).unwrap().days_since_year_zero() == -100 * 365 - 24);
 		assert!(Date::new(-400, 1, 1).unwrap().days_since_year_zero() == -400 * 365 - 97);
+
+		let mut date = Date::new(0, 1, 1).unwrap();
+		for i in 0..=10 * DAYS_IN_400_YEAR {
+			assert!(date.days_since_year_zero() == i);
+			date = date.next();
+		}
+
+		let mut date = Date::new(0, 1, 1).unwrap();
+		for i in (-10 * DAYS_IN_400_YEAR..=0).rev() {
+			assert!(date.days_since_year_zero() == i);
+			date = date.prev();
+		}
 	}
 
 	#[test]
@@ -348,6 +348,8 @@ mod test {
 		assert!(Date::from_days_since_year_zero(366) == Date::new(1, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 27) == Date::new(100, 2, 28).unwrap());
 		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 28) == Date::new(100, 3, 1).unwrap());
+		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 29) == Date::new(100, 3, 2).unwrap());
+		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 30) == Date::new(100, 3, 3).unwrap());
 		assert!(Date::from_days_since_year_zero(101 * 365 + 25) == Date::new(101, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(100 * 365 + 25 + 31 + 28) == Date::new(100, 3, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(200 * 365 + 49) == Date::new(200, 1, 1).unwrap());
@@ -358,6 +360,18 @@ mod test {
 		assert!(Date::from_days_since_year_zero(370 * 365 + 90) == Date::new(370, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(770 * 365 + 97 + 90) == Date::new(770, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(UNIX_EPOCH) == Date::new(1970, 1, 1).unwrap());
+
+		let mut date = Date::new(0, 1, 1).unwrap();
+		for i in 0..=10 * DAYS_IN_400_YEAR {
+			assert!(Date::from_days_since_year_zero(i) == date);
+			date = date.next();
+		}
+
+		let mut date = Date::new(0, 1, 1).unwrap();
+		for i in (-10 * DAYS_IN_400_YEAR..=0).rev() {
+			assert!(Date::from_days_since_year_zero(i) == date);
+			date = date.prev();
+		}
 	}
 
 	#[test]

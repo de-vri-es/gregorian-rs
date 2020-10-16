@@ -30,47 +30,14 @@ impl YearMonth {
 	/// so it reports 29 days for February of leap-years,
 	/// and 28 days for other years.
 	pub fn total_days(self) -> u8 {
-		match self.month {
-			Month::January => 31,
-			Month::February => {
-				if self.year.has_leap_day() {
-					29
-				} else {
-					28
-				}
-			}
-			Month::March => 31,
-			Month::April => 30,
-			Month::May => 31,
-			Month::June => 30,
-			Month::July => 31,
-			Month::August => 31,
-			Month::September => 30,
-			Month::October => 31,
-			Month::November => 30,
-			Month::December => 31,
-		}
+		crate::raw::days_in_month(self.month, self.year.has_leap_day())
 	}
 
 	/// Get the day-of-year on which the month starts.
 	///
 	/// Day-of-year numbers are 1-based.
 	pub fn day_of_year(self) -> u16 {
-		let leap_day_this_year = if self.year.has_leap_day() { 1 } else { 0 };
-		match self.month {
-			Month::January => 1,
-			Month::February => 32,
-			Month::March => 60 + leap_day_this_year,
-			Month::April => 91 + leap_day_this_year,
-			Month::May => 121 + leap_day_this_year,
-			Month::June => 152 + leap_day_this_year,
-			Month::July => 182 + leap_day_this_year,
-			Month::August => 213 + leap_day_this_year,
-			Month::September => 244 + leap_day_this_year,
-			Month::October => 274 + leap_day_this_year,
-			Month::November => 305 + leap_day_this_year,
-			Month::December => 335 + leap_day_this_year,
-		}
+		crate::raw::start_day_of_year(self.month, self.year.has_leap_day())
 	}
 
 	/// Get the next month as [`YearMonth`].
