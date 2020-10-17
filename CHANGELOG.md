@@ -7,6 +7,7 @@ Version 0.2.0:
   * Add `DateResultExt` extension trait for `Result<Date, InvalidDayOfMonth>` to easily round invalid dates.
   * Rename `InvalidDate::InvalidDayForMonth` to `InvalidDate::InvalidDayOfMonth` to match the wrapped struct.
   * Rename `InvalidDayOfYear::day` to `day_of year`.
+  * Make many functions `const`.
 
 Version 0.1.1:
   * Fix `Date::add_days` for days in years 100, 200 and 300 of the 400 year cycle.

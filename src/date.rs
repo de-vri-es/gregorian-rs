@@ -1,4 +1,5 @@
-use crate::{util::Modulo, DateParseError, InvalidDate, InvalidDayOfMonth, InvalidDateSyntax, Month, Year, YearMonth};
+use crate::{DateParseError, InvalidDate, InvalidDayOfMonth, InvalidDateSyntax, Month, Year, YearMonth};
+use crate::util::{modulo_i16, modulo_i32};
 
 /// The total number of days in 400 years.
 const DAYS_IN_400_YEAR: i32 = 400 * 365 + 97;
@@ -30,13 +31,20 @@ impl Date {
 		Ok(year_month.with_day(day)?)
 	}
 
+	/// Create a new date from a year, month and day.
+	///
+	/// Day numbers start at 1.
+	pub const fn new_const(year: Year, month: Month, day: u8) -> Result<Self, InvalidDayOfMonth> {
+		YearMonth::new_const(year, month).with_day(day)
+	}
+
 	/// Create a new date without checking the validity.
 	///
 	/// Month and day numbers start at 1.
 	///
 	/// # Safety
 	/// Although this is currently not the case, future implementations may rely on date validity for memory safety
-	pub unsafe fn new_unchecked(year: Year, month: Month, day: u8) -> Self {
+	pub const unsafe fn new_unchecked(year: Year, month: Month, day: u8) -> Self {
 		Self { year, month, day }
 	}
 
@@ -44,7 +52,7 @@ impl Date {
 	///
 	/// The timestamp is interpreted as number of seconds since 1 January 1970 00:00,
 	/// not including any leap seconds.
-	pub fn from_unix_timestamp(seconds: i64) -> Self {
+	pub const fn from_unix_timestamp(seconds: i64) -> Self {
 		let days = seconds / (24 * 3600);
 		let days = if seconds < 0 && seconds != days * 24 * 3600 {
 			days - 1
@@ -60,36 +68,36 @@ impl Date {
 	/// The timestamp is the number of seconds since 1 January 1970 00:00.
 	///
 	/// The returned timestamp is valid for time 00:00 of the date.
-	pub fn to_unix_timestamp(self) -> i64 {
+	pub const fn to_unix_timestamp(self) -> i64 {
 		let days = self.days_since_year_zero() - UNIX_EPOCH;
-		60 * 60 * 24 * i64::from(days)
+		60 * 60 * 24 * days as i64
 	}
 
 	/// Get the year.
-	pub fn year(self) -> Year {
+	pub const fn year(self) -> Year {
 		self.year
 	}
 
 	/// Get the month.
-	pub fn month(self) -> Month {
+	pub const fn month(self) -> Month {
 		self.month
 	}
 
 	/// Get the day of the month.
-	pub fn day(self) -> u8 {
+	pub const fn day(self) -> u8 {
 		self.day
 	}
 
 	/// Get the year and month as [`YearMonth`].
-	pub fn year_month(self) -> YearMonth {
-		YearMonth::new(self.year(), self.month())
+	pub const fn year_month(self) -> YearMonth {
+		YearMonth::new_const(self.year(), self.month())
 	}
 
 	/// Get the day of the year.
 	///
 	/// The returned number is 1-based.
 	/// For January 1, this function will return 1.
-	pub fn day_of_year(self) -> u16 {
+	pub const fn day_of_year(self) -> u16 {
 		crate::raw::day_of_year(self.month, self.day, self.year.has_leap_day())
 	}
 
@@ -97,7 +105,7 @@ impl Date {
 	///
 	/// For Janury 1 this will return 365 in a non-leap year or 366 in a leap year.
 	/// For December 31, this will return 1.
-	pub fn days_remaining_in_year(self) -> u16 {
+	pub const fn days_remaining_in_year(self) -> u16 {
 		self.year.total_days() - self.day_of_year() + 1
 	}
 
@@ -106,8 +114,8 @@ impl Date {
 	/// The returned value is zero-based.
 	/// For 1 January 0000, this function returns 0.
 	#[allow(clippy::identity_op)]
-	pub fn days_since_year_zero(self) -> i32 {
-		let years = ((self.year().to_number() % 400) + 400) % 400;
+	pub const fn days_since_year_zero(self) -> i32 {
+		let years = modulo_i16(self.year().to_number(), 400);
 		let whole_cycles = (self.year().to_number() - years) / 400;
 
 		// Plus one because year 0 is a leap year.
@@ -115,19 +123,19 @@ impl Date {
 		// But -1 in leap years because they're taken care of in self.day_of_year().
 		let leap_days = leap_days - if self.year.has_leap_day() { 1 } else { 0 };
 
-		let from_years = i32::from(whole_cycles) * DAYS_IN_400_YEAR + i32::from(years) * 365 + i32::from(leap_days);
+		let from_years = whole_cycles as i32 * DAYS_IN_400_YEAR + years as i32 * 365 + leap_days as i32;
 
-		from_years + i32::from(self.day_of_year()) - 1
+		from_years + self.day_of_year() as i32 - 1
 	}
 
 	/// Get the date corresponding to a number of days since the year zero.
 	///
 	/// For this function, day 0 is 1 January of year 0.
 	#[rustfmt::skip]
-	pub fn from_days_since_year_zero(days: i32) -> Self {
+	pub const fn from_days_since_year_zero(days: i32) -> Self {
 		// Get the day index in the current 400 year cycle,
 		// and the number of passed 400 year cycles.
-		let day_index = days.modulo(DAYS_IN_400_YEAR);
+		let day_index = modulo_i32(days, DAYS_IN_400_YEAR);
 		let whole_cycles = (days - day_index) / DAYS_IN_400_YEAR;
 
 		// How many leaps days did not happen at year 100, 200 and 300?
@@ -163,13 +171,17 @@ impl Date {
 		let year = Year::new(year as i16);
 
 		// Lie about leap years for year 100, 200 and 300 because we added pretend leaps days.
-		let (month, day_of_month) = crate::raw::month_and_day_from_day_of_year(day_of_year as u16, year_of_four_year_cycle == 0).unwrap();
+		let (month, day_of_month) = match crate::raw::month_and_day_from_day_of_year(day_of_year as u16, year_of_four_year_cycle == 0) {
+			Ok(x) => x,
+			// TODO: replace with unreachable! when const_panic is stabilized.
+			Err(()) => (Month::January, 1),
+		};
 
 		unsafe { year.with_month(month).with_day_unchecked(day_of_month) }
 	}
 
 	/// Get a [`Date`] object for the next day.
-	pub fn next(self) -> Date {
+	pub const fn next(self) -> Date {
 		if self.day == self.year_month().total_days() {
 			self.year_month().next().first_day()
 		} else {
@@ -182,7 +194,7 @@ impl Date {
 	}
 
 	/// Get a [`Date`] object for the previous day.
-	pub fn prev(self) -> Date {
+	pub const fn prev(self) -> Date {
 		if self.day == 1 {
 			self.year_month().prev().last_day()
 		} else {
@@ -195,12 +207,12 @@ impl Date {
 	}
 
 	/// Compute a date by adding days.
-	pub fn add_days(self, days: i32) -> Self {
+	pub const fn add_days(self, days: i32) -> Self {
 		Self::from_days_since_year_zero(self.days_since_year_zero() + days)
 	}
 
 	/// Compute a date by subtracting days.
-	pub fn sub_days(self, days: i32) -> Self {
+	pub const fn sub_days(self, days: i32) -> Self {
 		Self::from_days_since_year_zero(self.days_since_year_zero() - days)
 	}
 
@@ -209,7 +221,7 @@ impl Date {
 	/// The resulting date may not be valid.
 	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
 	/// to get the first day of the next month or the last day of resulting month.
-	pub fn add_months(self, months: i32) -> Result<Self, InvalidDayOfMonth> {
+	pub const fn add_months(self, months: i32) -> Result<Self, InvalidDayOfMonth> {
 		self.year_month().add_months(months).with_day(self.day())
 	}
 
@@ -218,7 +230,7 @@ impl Date {
 	/// The resulting date may not be valid.
 	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
 	/// to get the first day of the next month or the last day of resulting month.
-	pub fn sub_months(self, months: i32) -> Result<Self, InvalidDayOfMonth> {
+	pub const fn sub_months(self, months: i32) -> Result<Self, InvalidDayOfMonth> {
 		self.year_month().add_months(months).with_day(self.day())
 	}
 
@@ -227,7 +239,7 @@ impl Date {
 	/// The resulting date may not be valid.
 	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
 	/// to get the first day of the next month or the last day of resulting month.
-	pub fn add_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
+	pub const fn add_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
 		self.year_month().add_years(years).with_day(self.day())
 	}
 
@@ -236,7 +248,7 @@ impl Date {
 	/// The resulting date may not be valid.
 	/// You can call [`InvalidDayOfMonth::next_valid()`] or [`InvalidDayOfMonth::prev_valid()`]
 	/// to get the first day of the next month or the last day of resulting month.
-	pub fn sub_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
+	pub const fn sub_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
 		self.year_month().add_years(years).with_day(self.day())
 	}
 }

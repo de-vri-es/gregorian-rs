@@ -1,28 +1,25 @@
-pub trait Modulo: Copy {
-	fn modulo(self, other: Self) -> Self;
+pub const fn modulo_i16(a: i16, b: i16) -> i16 {
+	((a % b) + b) % b
 }
 
-impl Modulo for i32 {
-	fn modulo(self, b: Self) -> Self {
-		((self % b) + b) % b
-	}
+pub const fn modulo_i32(a: i32, b: i32) -> i32 {
+	((a % b) + b) % b
 }
 
 #[cfg(test)]
 mod test {
-	use super::*;
 	use assert2::assert;
 
 	#[test]
-	fn modulo() {
-		assert!((8).modulo(12) == 8);
-		assert!((20).modulo(12) == 8);
-		assert!((-4).modulo(12) == 8);
-		assert!((-16).modulo(12) == 8);
+	fn modulo_i32() {
+		assert!(super::modulo_i32(8, 12) == 8);
+		assert!(super::modulo_i32(20, 12) == 8);
+		assert!(super::modulo_i32(-4, 12) == 8);
+		assert!(super::modulo_i32(-16, 12) == 8);
 
-		assert!((12).modulo(12) == 0);
-		assert!((24).modulo(12) == 0);
-		assert!((-12).modulo(12) == 0);
-		assert!((-24).modulo(12) == 0);
+		assert!(super::modulo_i32(12, 12) == 0);
+		assert!(super::modulo_i32(24, 12) == 0);
+		assert!(super::modulo_i32(-12, 12) == 0);
+		assert!(super::modulo_i32(-24, 12) == 0);
 	}
 }

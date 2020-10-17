@@ -29,7 +29,7 @@ impl Month {
 	/// Create a new month from a month number.
 	///
 	/// The number must be in the range 1-12 (inclusive).
-	pub fn new(month: u8) -> Result<Self, InvalidMonthNumber> {
+	pub const fn new(month: u8) -> Result<Self, InvalidMonthNumber> {
 		match month {
 			1 => Ok(Self::January),
 			2 => Ok(Self::February),
@@ -57,8 +57,27 @@ impl Month {
 	}
 
 	/// Get the month number in the range 1-12.
-	pub fn to_number(self) -> u8 {
+	pub const fn to_number(self) -> u8 {
 		self as u8
+	}
+
+	const fn from_number(number: u8) -> Self {
+		match number {
+			1 => Self::January,
+			2 => Self::February,
+			3 => Self::March,
+			4 => Self::April,
+			5 => Self::May,
+			6 => Self::June,
+			7 => Self::July,
+			8 => Self::August,
+			9 => Self::September,
+			10 => Self::October,
+			11 => Self::November,
+			12 => Self::December,
+			//TODO: Replace this with unreachable!() when const_panic is stabilized.
+			_ => Self::January,
+		}
 	}
 
 	/// Combine the month with a year to create a [`YearMonth`].
@@ -67,31 +86,31 @@ impl Month {
 	}
 
 	/// Add a number of months, wrapping back to January after December.
-	pub fn wrapping_add(self, count: i8) -> Self {
+	pub const fn wrapping_add(self, count: i8) -> Self {
 		let count = if count < 0 {
 			(count % 12) + 12
 		} else {
 			count % 12
 		};
 		let index = (self.to_number() as i8 - 1 + count) % 12;
-		unsafe { Self::new_unchecked((index + 1) as u8) }
+		Self::from_number(index as u8 + 1)
 	}
 
 	/// Add a number of months, wrapping back to December after January.
-	pub fn wrapping_sub(self, count: i8) -> Self {
+	pub const fn wrapping_sub(self, count: i8) -> Self {
 		// Take remainder after dividing by 12 before negating,
 		// to prevent negating i8::MIN.
 		self.wrapping_add(-(count % 12))
 	}
 
 	/// Get the next month, wrapping back to January after December.
-	pub fn wrapping_next(self) -> Self {
+	pub const fn wrapping_next(self) -> Self {
 		self.wrapping_add(1)
 	}
 
 	/// Get the previous month, wrapping back to December after January.
-	pub fn wrapping_prev(self) -> Self {
-		self.wrapping_add(11)
+	pub const fn wrapping_prev(self) -> Self {
+		self.wrapping_add(-1)
 	}
 }
 

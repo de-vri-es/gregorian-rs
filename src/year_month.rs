@@ -14,13 +14,21 @@ impl YearMonth {
 		Self { year, month }
 	}
 
+	/// Create a new year-month at compile time.
+	///
+	/// Unline, [`Self::new()`], this takes a [`Year`] instead of an `impl Into<Year>`,
+	/// since the conversion can not be done in a `const fn`.
+	pub const fn new_const(year: Year, month: Month) -> Self {
+		Self { year, month }
+	}
+
 	/// Get the year.
-	pub fn year(self) -> Year {
+	pub const fn year(self) -> Year {
 		self.year
 	}
 
 	/// Get the month as [`Month`].
-	pub fn month(self) -> Month {
+	pub const fn month(self) -> Month {
 		self.month
 	}
 
@@ -29,54 +37,56 @@ impl YearMonth {
 	/// This function accounts for leap-days,
 	/// so it reports 29 days for February of leap-years,
 	/// and 28 days for other years.
-	pub fn total_days(self) -> u8 {
+	pub const fn total_days(self) -> u8 {
 		crate::raw::days_in_month(self.month, self.year.has_leap_day())
 	}
 
 	/// Get the day-of-year on which the month starts.
 	///
 	/// Day-of-year numbers are 1-based.
-	pub fn day_of_year(self) -> u16 {
+	pub const fn day_of_year(self) -> u16 {
 		crate::raw::start_day_of_year(self.month, self.year.has_leap_day())
 	}
 
 	/// Get the next month as [`YearMonth`].
 	///
 	/// After December, this function returns January of the next year.
-	pub fn next(self) -> Self {
-		if self.month == Month::December {
-			Self::new(self.year.next(), Month::January)
+	pub const fn next(self) -> Self {
+		if let Month::December = self.month {
+			Self::new_const(self.year.next(), Month::January)
 		} else {
-			Self::new(self.year, self.month.wrapping_next())
+			Self::new_const(self.year, self.month.wrapping_next())
 		}
 	}
 
 	/// Get the previous month as [`YearMonth`].
 	///
 	/// After January, this function returns December of the previous year.
-	pub fn prev(self) -> Self {
-		if self.month == Month::January {
-			Self::new(self.year.prev(), Month::December)
+	pub const fn prev(self) -> Self {
+		if let Month::January = self.month {
+			Self::new_const(self.year.prev(), Month::December)
 		} else {
-			Self::new(self.year, self.month.wrapping_prev())
+			Self::new_const(self.year, self.month.wrapping_prev())
 		}
 	}
 
 	/// Get a new [`YearMonth`] by adding a number of years.
-	pub fn add_years(self, years: i16) -> Self {
-		(self.year() + years).with_month(self.month())
+	pub const fn add_years(self, years: i16) -> Self {
+		let year = Year::new(self.year.to_number() + years);
+		year.with_month(self.month())
 	}
 
 	/// Get a new [`YearMonth`] by subtracting a number of years.
-	pub fn sub_years(self, years: i16) -> Self {
-		(self.year() - years).with_month(self.month())
+	pub const fn sub_years(self, years: i16) -> Self {
+		let year = Year::new(self.year.to_number() - years);
+		year.with_month(self.month())
 	}
 
 	/// Get a new [`YearMonth`] by adding a number of months.
-	pub fn add_months(self, months: i32) -> Self {
+	pub const fn add_months(self, months: i32) -> Self {
 		// Split calculation for years and months.
-		let months = i32::from(self.month().to_number() - 1) + months;
-		let mut year = self.year() + (months / 12) as i16;
+		let months = (self.month().to_number() - 1) as i32 + months;
+		let mut year = self.year().to_number() + (months / 12) as i16;
 		let month = Month::January.wrapping_add((months % 12) as i8);
 
 		// If we subtract months, we must decrease the year too.
@@ -84,18 +94,20 @@ impl YearMonth {
 			year -= 1;
 		}
 
-		year.with_month(month)
+		Year::new(year).with_month(month)
 	}
 
 	/// Get a new [`YearMonth`] by subtracting a number of months.
-	pub fn sub_months(self, months: i32) -> Self {
+	pub const fn sub_months(self, months: i32) -> Self {
 		// This breaks for i32::MIN, but that would overflow the year counter anyway.
 		self.add_months(-months)
 	}
 
 	/// Combine the year and month with a day, to create a full [`Date`].
-	pub fn with_day(self, day: u8) -> Result<Date, InvalidDayOfMonth> {
-		InvalidDayOfMonth::check(self.year, self.month, day)?;
+	pub const fn with_day(self, day: u8) -> Result<Date, InvalidDayOfMonth> {
+		if let Err(e) = InvalidDayOfMonth::check(self.year, self.month, day) {
+			return Err(e);
+		}
 		unsafe { Ok(Date::new_unchecked(self.year, self.month, day)) }
 	}
 
@@ -103,12 +115,12 @@ impl YearMonth {
 	///
 	/// # Safety
 	/// Although this is currently not the case, future implementations may rely on date validity for memory safety
-	pub unsafe fn with_day_unchecked(self, day: u8) -> Date {
+	pub const unsafe fn with_day_unchecked(self, day: u8) -> Date {
 		Date::new_unchecked(self.year, self.month, day)
 	}
 
 	/// Get the first day of the month as [`Date`].
-	pub fn first_day(self) -> Date {
+	pub const fn first_day(self) -> Date {
 		Date {
 			year: self.year,
 			month: self.month,
@@ -117,7 +129,7 @@ impl YearMonth {
 	}
 
 	/// Get the last day of the month as [`Date`].
-	pub fn last_day(self) -> Date {
+	pub const fn last_day(self) -> Date {
 		Date {
 			year: self.year,
 			month: self.month,

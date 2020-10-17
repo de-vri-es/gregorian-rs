@@ -10,12 +10,12 @@ pub struct Year {
 
 impl Year {
 	/// Create a new year from a number.
-	pub fn new(year: i16) -> Self {
+	pub const fn new(year: i16) -> Self {
 		Self { year }
 	}
 
 	/// Get the year number.
-	pub fn to_number(self) -> i16 {
+	pub const fn to_number(self) -> i16 {
 		self.year
 	}
 
@@ -23,7 +23,7 @@ impl Year {
 	///
 	/// In the proleptic Gregorian calendar with a year 0,
 	/// the year 0 has a leap day.
-	pub fn has_leap_day(self) -> bool {
+	pub const fn has_leap_day(self) -> bool {
 		self.year % 4 == 0 && (self.year % 100 != 0 || self.year % 400 == 0)
 	}
 
@@ -31,7 +31,7 @@ impl Year {
 	///
 	/// For leap years, this is 366.
 	/// For other years, this is 365.
-	pub fn total_days(self) -> u16 {
+	pub const fn total_days(self) -> u16 {
 		if self.has_leap_day() {
 			366
 		} else {
@@ -40,42 +40,44 @@ impl Year {
 	}
 
 	/// Get the next year.
-	pub fn next(self) -> Self {
-		self + 1
+	pub const fn next(self) -> Self {
+		Self { year: self.year + 1 }
 	}
 
 	/// Get the previous year.
-	pub fn prev(self) -> Self {
-		self - 1
+	pub const fn prev(self) -> Self {
+		Self { year: self.year - 1 }
 	}
 
 	/// Combine the year with a month to create a [`YearMonth`].
-	pub fn with_month(self, month: Month) -> YearMonth {
-		YearMonth::new(self, month)
+	pub const fn with_month(self, month: Month) -> YearMonth {
+		YearMonth::new_const(self, month)
 	}
 
 	/// Combine the year with a day-of-year to create a [`Date`].
 	///
 	/// Day-of-year numbers start a 1 for January 1.
-	pub fn with_day_of_year(self, day_of_year: u16) -> Result<Date, InvalidDayOfYear> {
-		let (month, day_of_month) = crate::raw::month_and_day_from_day_of_year(day_of_year, self.has_leap_day())
-			.map_err(|()| InvalidDayOfYear { year: self, day_of_year })?;
+	pub const fn with_day_of_year(self, day_of_year: u16) -> Result<Date, InvalidDayOfYear> {
+		let (month, day_of_month) = match crate::raw::month_and_day_from_day_of_year(day_of_year, self.has_leap_day()) {
+			Ok(x) => x,
+			Err(()) => return Err(InvalidDayOfYear { year: self, day_of_year }),
+		};
 
 		Ok(unsafe { self.with_month(month).with_day_unchecked(day_of_month) })
 	}
 
 	/// Get the first month of the year as [`YearMonth`].
-	pub fn first_month(self) -> YearMonth {
+	pub const fn first_month(self) -> YearMonth {
 		self.with_month(Month::January)
 	}
 
 	/// Get the last month of the year as [`YearMonth`].
-	pub fn last_month(self) -> YearMonth {
+	pub const fn last_month(self) -> YearMonth {
 		self.with_month(Month::December)
 	}
 
 	/// Get all months of the year as [`YearMonth`] array.
-	pub fn months(self) -> [YearMonth; 12] {
+	pub const fn months(self) -> [YearMonth; 12] {
 		[
 			self.with_month(Month::January),
 			self.with_month(Month::February),
@@ -93,7 +95,7 @@ impl Year {
 	}
 
 	/// Get the first day of the year as [`Date`].
-	pub fn first_day(self) -> Date {
+	pub const fn first_day(self) -> Date {
 		Date {
 			year: self,
 			month: Month::January,
@@ -102,7 +104,7 @@ impl Year {
 	}
 
 	/// Get the last day of the year as [`Date`].
-	pub fn last_day(self) -> Date {
+	pub const fn last_day(self) -> Date {
 		Date {
 			year: self,
 			month: Month::December,

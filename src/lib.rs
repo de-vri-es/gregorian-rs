@@ -11,6 +11,9 @@
 //! the [`Month`] type represents a calendar month,
 //! and the [`YearMonth`] type represents a month of a specific year.
 //!
+//! Where possible, things are implemented as `const fn`.
+//! Currently, this excludes trait implementations and functions that rely on traits.
+//!
 //! # Example
 //! ```
 //! use gregorian::{Date, Month::*, Year, YearMonth};

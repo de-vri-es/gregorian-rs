@@ -54,8 +54,8 @@ pub struct InvalidDayOfYear {
 }
 
 impl InvalidDayOfMonth {
-	pub fn check(year: Year, month: Month, day: u8) -> Result<(), Self> {
-		if day < 1 || day > YearMonth::new(year, month).total_days() {
+	pub const fn check(year: Year, month: Month, day: u8) -> Result<(), Self> {
+		if day < 1 || day > YearMonth::new_const(year, month).total_days() {
 			Err(Self { year, month, day })
 		} else {
 			Ok(())
@@ -67,14 +67,14 @@ impl InvalidDayOfMonth {
 	/// This function returns the first day of the next month for the invalid date.
 	///
 	/// It does not add the excess days in the new month.
-	pub fn next_valid(self) -> Date {
+	pub const fn next_valid(self) -> Date {
 		self.year.with_month(self.month).next().first_day()
 	}
 
 	/// Get the last valid date before the invalid date.
 	///
 	/// This function returns the last day of the current month for the invalid date.
-	pub fn prev_valid(self) -> Date {
+	pub const fn prev_valid(self) -> Date {
 		self.year.with_month(self.month).last_day()
 	}
 }
