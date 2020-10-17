@@ -1,4 +1,4 @@
-use crate::{Date, December, InvalidDayOfYear, January, Month, YearMonth};
+use crate::{Date, InvalidDayOfYear, Month, YearMonth};
 
 /// A calendar year.
 ///
@@ -66,12 +66,12 @@ impl Year {
 
 	/// Get the first month of the year as [`YearMonth`].
 	pub fn first_month(self) -> YearMonth {
-		self.with_month(January)
+		self.with_month(Month::January)
 	}
 
 	/// Get the last month of the year as [`YearMonth`].
 	pub fn last_month(self) -> YearMonth {
-		self.with_month(December)
+		self.with_month(Month::December)
 	}
 
 	/// Get all months of the year as [`YearMonth`] array.
@@ -96,7 +96,7 @@ impl Year {
 	pub fn first_day(self) -> Date {
 		Date {
 			year: self,
-			month: January,
+			month: Month::January,
 			day: 1,
 		}
 	}
@@ -105,7 +105,7 @@ impl Year {
 	pub fn last_day(self) -> Date {
 		Date {
 			year: self,
-			month: December,
+			month: Month::December,
 			day: 31,
 		}
 	}
@@ -206,6 +206,24 @@ mod test {
 		assert!(let Err(_) = Year::new(2021).with_day_of_year(0));
 		assert!(let Err(_) = Year::new(2020).with_day_of_year(367));
 		assert!(let Err(_) = Year::new(2021).with_day_of_year(368));
+	}
+
+	#[test]
+	fn months() {
+		let year = Year::new(2020);
+		let months = year.months();
+		assert!(months[0] == year.with_month(Month::January));
+		assert!(months[1] == year.with_month(Month::February));
+		assert!(months[2] == year.with_month(Month::March));
+		assert!(months[3] == year.with_month(Month::April));
+		assert!(months[4] == year.with_month(Month::May));
+		assert!(months[5] == year.with_month(Month::June));
+		assert!(months[6] == year.with_month(Month::July));
+		assert!(months[7] == year.with_month(Month::August));
+		assert!(months[8] == year.with_month(Month::September));
+		assert!(months[9] == year.with_month(Month::October));
+		assert!(months[10] == year.with_month(Month::November));
+		assert!(months[11] == year.with_month(Month::December));
 	}
 
 	#[test]
