@@ -175,6 +175,48 @@ mod test {
 	}
 
 	#[test]
+	fn total_days() {
+		assert!(Year::new(2020).with_month(January).total_days() == 31);
+		assert!(Year::new(2020).with_month(February).total_days() == 29);
+		assert!(Year::new(2020).with_month(March).total_days() == 31);
+		assert!(Year::new(2020).with_month(April).total_days() == 30);
+		assert!(Year::new(2020).with_month(May).total_days() == 31);
+		assert!(Year::new(2020).with_month(June).total_days() == 30);
+		assert!(Year::new(2020).with_month(July).total_days() == 31);
+		assert!(Year::new(2020).with_month(August).total_days() == 31);
+		assert!(Year::new(2020).with_month(September).total_days() == 30);
+		assert!(Year::new(2020).with_month(October).total_days() == 31);
+		assert!(Year::new(2020).with_month(November).total_days() == 30);
+		assert!(Year::new(2020).with_month(December).total_days() == 31);
+
+		assert!(Year::new(2021).with_month(January).total_days() == 31);
+		assert!(Year::new(2021).with_month(February).total_days() == 28);
+		assert!(Year::new(2021).with_month(March).total_days() == 31);
+		assert!(Year::new(2021).with_month(April).total_days() == 30);
+		assert!(Year::new(2021).with_month(May).total_days() == 31);
+		assert!(Year::new(2021).with_month(June).total_days() == 30);
+		assert!(Year::new(2021).with_month(July).total_days() == 31);
+		assert!(Year::new(2021).with_month(August).total_days() == 31);
+		assert!(Year::new(2021).with_month(September).total_days() == 30);
+		assert!(Year::new(2021).with_month(October).total_days() == 31);
+		assert!(Year::new(2021).with_month(November).total_days() == 30);
+		assert!(Year::new(2021).with_month(December).total_days() == 31);
+	}
+
+	#[test]
+	fn start_day_of_year() {
+		for year in -400..=400 {
+			// We assume total_days() works, since it has it's own unit test,
+			// then cross check start days against that.
+			let mut start_day = 1;
+			for month in &Year::new(year).months() {
+				assert!(month.day_of_year() == start_day);
+				start_day += u16::from(month.total_days());
+			}
+		}
+	}
+
+	#[test]
 	fn format() {
 		assert!(format!("{}", Year::new(2020).with_month(January)) == "2020-01");
 		assert!(format!("{:?}", Year::new(2020).with_month(January)) == "YearMonth(2020-01)");
