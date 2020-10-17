@@ -175,7 +175,7 @@ mod test {
 	use assert2::{assert, let_assert};
 
 	#[test]
-	fn next_prev_valid() {
+	fn invalid_day_of_month_next_prev_valid() {
 		let_assert!(Err(InvalidDate::InvalidDayOfMonth(e)) = Date::new(2020, April, 31));
 		assert!(e.next_valid() == Date::new(2020, May, 1).unwrap());
 		assert!(e.prev_valid() == Date::new(2020, April, 30).unwrap());

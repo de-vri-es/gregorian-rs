@@ -144,7 +144,7 @@ mod test {
 	use assert2::assert;
 
 	#[test]
-	fn test_add_months() {
+	fn add_months() {
 		for i in -200..=200 {
 			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 1) == Year::new(2000 + i as i16).with_month(February));
 			assert!(Year::new(2000).with_month(January).add_months(i * 12 + 2) == Year::new(2000 + i as i16).with_month(March));
@@ -175,7 +175,7 @@ mod test {
 	}
 
 	#[test]
-	fn year_month_fmt() {
+	fn format() {
 		assert!(format!("{}", Year::new(2020).with_month(January)) == "2020-01");
 		assert!(format!("{:?}", Year::new(2020).with_month(January)) == "YearMonth(2020-01)");
 	}

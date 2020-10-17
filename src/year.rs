@@ -181,7 +181,7 @@ mod test {
 	use assert2::assert;
 
 	#[test]
-	fn test_is_leap_year() {
+	fn has_leap_day() {
 		assert!(Year::new(2020).has_leap_day() == true);
 		assert!(Year::new(2021).has_leap_day() == false);
 		assert!(Year::new(1900).has_leap_day() == false);
@@ -209,7 +209,7 @@ mod test {
 	}
 
 	#[test]
-	fn year_fmt() {
+	fn format_year() {
 		assert!(format!("{}", Year::new(2020)) == "2020");
 		assert!(format!("{:?}", Year::new(2020)) == "Year(2020)");
 	}

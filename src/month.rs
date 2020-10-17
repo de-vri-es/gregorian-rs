@@ -128,7 +128,7 @@ mod test {
 	use assert2::assert;
 
 	#[test]
-	fn test_number() {
+	fn to_number() {
 		assert!(let Err(InvalidMonthNumber { number: 0 }) = Month::new(0));
 		assert!(let Err(InvalidMonthNumber { number: 13 }) = Month::new(13));
 		assert!(let Ok(January) = Month::new(1));
@@ -187,13 +187,13 @@ mod test {
 	}
 
 	#[test]
-	fn test_with_year() {
+	fn with_year() {
 		assert!(January.with_year(2020) == YearMonth::new(2020, January));
 		assert!(February.with_year(-1200) == YearMonth::new(-1200, February));
 	}
 
 	#[test]
-	fn test_wrapping_add() {
+	fn wrapping_add() {
 		assert!(January.wrapping_add(0) == January);
 		assert!(January.wrapping_add(1) == February);
 		assert!(January.wrapping_add(2) == March);
@@ -207,7 +207,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_wrapping_sub() {
+	fn wrapping_sub() {
 		assert!(January.wrapping_sub(0) == January);
 		assert!(January.wrapping_sub(1) == December);
 		assert!(January.wrapping_sub(2) == November);
@@ -222,7 +222,7 @@ mod test {
 	}
 
 	#[test]
-	fn month_fmt() {
+	fn format() {
 		assert!(format!("{}", January) == "January");
 		assert!(format!("{:?}", January) == "January");
 	}

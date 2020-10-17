@@ -279,7 +279,7 @@ mod test {
 	use assert2::assert;
 
 	#[test]
-	fn test_make_date() {
+	fn new() {
 		assert!(let Ok(_) = Date::new(2020, 1, 2));
 		assert!(Date::new(2020, 1, 2).unwrap().year() == 2020);
 		assert!(Date::new(2020, 1, 2).unwrap().month() == 1);
@@ -292,14 +292,14 @@ mod test {
 	}
 
 	#[test]
-	fn test_next_date() {
+	fn next() {
 		assert!(Date::new(2020, 1, 2).unwrap().next() == Date::new(2020, 1, 3).unwrap());
 		assert!(Date::new(2020, 1, 31).unwrap().next() == Date::new(2020, 2, 1).unwrap());
 		assert!(Date::new(2020, 12, 31).unwrap().next() == Date::new(2021, 1, 1).unwrap());
 	}
 
 	#[test]
-	fn test_day_of_year() {
+	fn day_of_year() {
 		assert!(Date::new(2019, 1, 1).unwrap().day_of_year() == 1);
 		assert!(Date::new(2019, 2, 1).unwrap().day_of_year() == 32);
 		assert!(Date::new(2019, 3, 1).unwrap().day_of_year() == 60);
@@ -348,7 +348,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_days_since_year_zero() {
+	fn days_since_year_zero() {
 		assert!(Date::new(0, 1, 1).unwrap().days_since_year_zero() == 0);
 		assert!(Date::new(400, 1, 1).unwrap().days_since_year_zero() == 1 * (400 * 365 + 97));
 		assert!(Date::new(800, 1, 1).unwrap().days_since_year_zero() == 2 * (400 * 365 + 97));
@@ -382,7 +382,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_from_days_since_year_zero() {
+	fn from_days_since_year_zero() {
 		assert!(Date::from_days_since_year_zero(0) == Date::new(0, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(1 * (400 * 365 + 97)) == Date::new(400, 1, 1).unwrap());
 		assert!(Date::from_days_since_year_zero(2 * (400 * 365 + 97)) == Date::new(800, 1, 1).unwrap());
@@ -429,7 +429,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_add_days() {
+	fn add_days() {
 		assert!(Date::new(2020, 1, 1).unwrap().add_days(1) == Date::new(2020, 1, 2).unwrap());
 		assert!(Date::new(2020, 1, 1).unwrap().add_days(31) == Date::new(2020, 2, 1).unwrap());
 		assert!(Date::new(2020, 1, 1).unwrap().add_days(366) == Date::new(2021, 1, 1).unwrap());
@@ -462,7 +462,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_add_years() {
+	fn add_years() {
 		assert!(Date::new(2020, 1, 1).unwrap().add_years(1).unwrap() == Date::new(2021, 1, 1).unwrap());
 		assert!(Date::new(2000, 2, 29).unwrap().add_years(400).unwrap() == Date::new(2400, 2, 29).unwrap());
 		assert!(Date::new(2000, 2, 29).unwrap().add_years(100).unwrap_err().prev_valid() == Date::new(2100, 2, 28).unwrap());
@@ -470,7 +470,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_add_months() {
+	fn add_months() {
 		assert!(Date::new(2021, 1, 31).unwrap().add_months(2).unwrap() == Date::new(2021, 3, 31).unwrap());
 		assert!(Date::new(2021, 1, 31).unwrap().add_months(1).unwrap_err().prev_valid() == Date::new(2021, 2, 28).unwrap());
 		assert!(Date::new(2021, 1, 31).unwrap().add_months(1).unwrap_err().next_valid() == Date::new(2021, 3, 1).unwrap());
@@ -481,7 +481,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_parse_date() {
+	fn parse() {
 		assert!("2020-01-02".parse::<Date>().unwrap().year() == 2020);
 		assert!("2020-01-02".parse::<Date>().unwrap().month() == 1);
 		assert!("2020-01-02".parse::<Date>().unwrap().day() == 2);
@@ -490,7 +490,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_from_unix_timestamp() {
+	fn from_unix_timestamp() {
 		const SECONDS_IN_DAY: i64 = 60 * 60 * 24;
 		assert!(Date::from_unix_timestamp(0) == Date::new(1970, 1, 1).unwrap());
 		assert!(Date::from_unix_timestamp(SECONDS_IN_DAY) == Date::new(1970, 1, 2).unwrap());
@@ -500,7 +500,7 @@ mod test {
 	}
 
 	#[test]
-	fn test_to_unix_timestamp() {
+	fn to_unix_timestamp() {
 		const SECONDS_IN_DAY: i64 = 60 * 60 * 24;
 		assert!(Date::new(1970, 1, 1).unwrap().to_unix_timestamp() == 0);
 		assert!(Date::new(1970, 1, 2).unwrap().to_unix_timestamp() == SECONDS_IN_DAY);
@@ -508,7 +508,7 @@ mod test {
 	}
 
 	#[test]
-	fn date_fmt() {
+	fn format() {
 		assert!(format!("{}", Date::new(2020, Month::January, 2).unwrap()) == "2020-01-02");
 		assert!(format!("{:?}", Date::new(2020, Month::January, 2).unwrap()) == "Date(2020-01-02)");
 	}
