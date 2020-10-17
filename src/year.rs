@@ -189,6 +189,26 @@ mod test {
 	}
 
 	#[test]
+	fn with_day_of_year() {
+		let mut date = Date::new(2020, 1, 1).unwrap();
+		for i in 1..=366 {
+			assert!(Year::new(2020).with_day_of_year(i).unwrap() == date);
+			date = date.next();
+		}
+
+		let mut date = Date::new(2021, 1, 1).unwrap();
+		for i in 1..=365 {
+			assert!(Year::new(2021).with_day_of_year(i).unwrap() == date);
+			date = date.next();
+		}
+
+		assert!(let Err(_) = Year::new(2020).with_day_of_year(0));
+		assert!(let Err(_) = Year::new(2021).with_day_of_year(0));
+		assert!(let Err(_) = Year::new(2020).with_day_of_year(367));
+		assert!(let Err(_) = Year::new(2021).with_day_of_year(368));
+	}
+
+	#[test]
 	fn year_fmt() {
 		assert!(format!("{}", Year::new(2020)) == "2020");
 		assert!(format!("{:?}", Year::new(2020)) == "Year(2020)");

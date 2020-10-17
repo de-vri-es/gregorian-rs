@@ -333,6 +333,18 @@ mod test {
 		assert!(Date::new(2019, 12, 31).unwrap().day_of_year() == 365);
 
 		assert!(Date::new(2020, 12, 31).unwrap().day_of_year() == 366);
+
+		let mut date = Date::new(2020, 1, 1).unwrap();
+		for i in 1..=366 {
+			assert!(date.day_of_year() == i);
+			date = date.next();
+		}
+
+		let mut date = Date::new(2021, 1, 1).unwrap();
+		for i in 1..=365 {
+			assert!(date.day_of_year() == i);
+			date = date.next();
+		}
 	}
 
 	#[test]
