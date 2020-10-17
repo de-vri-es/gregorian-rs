@@ -1,7 +1,7 @@
 use crate::{Date, InvalidDayOfMonth};
 
 /// Extension for `Result<Date>` to round invalid dates.
-trait DateResultExt {
+pub trait DateResultExt {
 	/// Get the date or the next valid date.
 	///
 	/// This function gives the first day of the next month for the invalid date.

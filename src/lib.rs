@@ -30,6 +30,23 @@
 //!
 //! assert!(Date::new(2020, 2, 1).unwrap().day_of_year() == 32);
 //! ```
+//!
+//! # Rounding invalid dates
+//! When you use [`Date::add_years()`] or [`Date::add_months()`], you can get invalid dates.
+//! These are reported with an [`InvalidDayOfMonth`] error which has the
+//! [`next_valid()`][InvalidDayOfMonth::next_valid] and [`prev_valid()`][InvalidDayOfMonth::prev_valid] methods.
+//! Those can be used to get the next or previous valid date instead.
+//!
+//! Additionally, there is an extension trait for `Result<Date, InvalidDayOfMonth>` with the
+//! [`or_next_valid()`][DateResultExt::or_next_valid] and [`or_prev_valid()`][DateResultExt::or_prev_valid] methods.
+//! This allows you to directly round the date on the `Result` object.
+//!
+//!```
+//! use gregorian::{Date, DateResultExt};
+//! let date = Date::new(2020, 1, 31).unwrap();
+//! assert!(date.add_months(1).or_next_valid() == Date::new(2020, 3, 1).unwrap());
+//! assert!(date.add_months(1).or_prev_valid() == Date::new(2020, 2, 29).unwrap());
+//! ```
 
 mod date;
 mod error;
