@@ -557,6 +557,7 @@ mod test {
 	}
 
 	#[test]
+	#[cfg(feature = "std")]
 	fn format() {
 		assert!(format!("{}", Date::new(2020, Month::January, 2).unwrap()) == "2020-01-02");
 		assert!(format!("{:?}", Date::new(2020, Month::January, 2).unwrap()) == "Date(2020-01-02)");

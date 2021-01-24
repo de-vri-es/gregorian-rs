@@ -241,6 +241,7 @@ mod test {
 	}
 
 	#[test]
+	#[cfg(feature = "std")]
 	fn format() {
 		assert!(format!("{}", January) == "January");
 		assert!(format!("{:?}", January) == "January");

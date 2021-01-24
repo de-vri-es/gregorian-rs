@@ -229,6 +229,7 @@ mod test {
 	}
 
 	#[test]
+	#[cfg(feature = "std")]
 	fn format_year() {
 		assert!(format!("{}", Year::new(2020)) == "2020");
 		assert!(format!("{:?}", Year::new(2020)) == "Year(2020)");
