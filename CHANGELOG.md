@@ -1,3 +1,6 @@
+Version 0.2.1:
+  * Add `Date::today()` and `Date::today_utc()`.
+
 Version 0.2.0:
   * Make `Debug` string representations more compact.
   * `Month::wrapping_add/sub` now take an `i8` instead of `u8`.

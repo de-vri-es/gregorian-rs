@@ -43,9 +43,37 @@ impl Date {
 	/// Month and day numbers start at 1.
 	///
 	/// # Safety
-	/// Although this is currently not the case, future implementations may rely on date validity for memory safety
+	/// Although this is currently not the case,
+	/// future implementations may rely on date validity for memory safety
 	pub const unsafe fn new_unchecked(year: Year, month: Month, day: u8) -> Self {
 		Self { year, month, day }
+	}
+
+	/// Get the current date in the local time zone.
+	#[cfg(feature = "std")]
+	pub fn today() -> Self {
+		unsafe {
+			let time = libc::time(std::ptr::null_mut());
+			let mut tm: libc::tm = std::mem::zeroed();
+			if libc::localtime_r(&time, &mut tm).is_null() {
+				panic!("failed to determine current time in local time zone");
+			}
+			let year = Year::new(tm.tm_year as i16 + 1900);
+			let month = Month::new_unchecked(tm.tm_mon as u8 + 1);
+			let day = tm.tm_mday as u8; // Weirdly, tm_mday is 1 based while tm_mon is zero based.
+			Date::new_unchecked(year, month, day)
+		}
+	}
+
+	/// Get the current date of the UTC time zone.
+	#[cfg(feature = "std")]
+	pub fn today_utc() -> Self {
+		let seconds = std::time::SystemTime::now()
+			.duration_since(std::time::SystemTime::UNIX_EPOCH)
+			.unwrap()
+			.as_secs();
+		let days = seconds / 60 / 60 / 24;
+		Self::from_days_since_year_zero(UNIX_EPOCH + days as i32)
 	}
 
 	/// Get the date for a unix timestamp.
@@ -301,6 +329,15 @@ mod test {
 		assert!(let Err(_) = Date::new(2020, 2, 30));
 		assert!(let Ok(_) = Date::new(2019, 2, 28));
 		assert!(let Err(_) = Date::new(2019, 2, 29));
+	}
+
+	#[test]
+	#[cfg(feature = "std")]
+	fn today() {
+		// Got nothing to check it against really, but lets see at least that it does not panic,
+		// and that it's atleast 2021.
+		assert!(Date::today().year() >= 2021);
+		assert!(Date::today_utc().year() >= 2021);
 	}
 
 	#[test]

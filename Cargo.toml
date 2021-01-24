@@ -15,7 +15,10 @@ edition = "2018"
 
 [features]
 default = ["std"]
-std = []
+std = ["libc"]
+
+[dependencies]
+libc = { version = "0.2.82", optional = true }
 
 [dev-dependencies]
 assert2 = "0.3.3"
