@@ -279,6 +279,14 @@ impl Date {
 	pub const fn sub_years(self, years: i16) -> Result<Self, InvalidDayOfMonth> {
 		self.year_month().add_years(years).with_day(self.day())
 	}
+
+	/// Compute the difference in days between two dates.
+	///
+	/// This does not include the end date.
+	/// For example, difference between the same date will be 0.
+	pub const fn days_since(date_1: Date, date_2: Date) -> i32 {
+		return date_2.days_since_year_zero() - date_1.days_since_year_zero();
+	}
 }
 
 impl core::str::FromStr for Date {
@@ -554,6 +562,13 @@ mod test {
 		assert!(Date::new(1970, 1, 1).unwrap().to_unix_timestamp() == 0);
 		assert!(Date::new(1970, 1, 2).unwrap().to_unix_timestamp() == SECONDS_IN_DAY);
 		assert!(Date::new(2020, 06, 20).unwrap().to_unix_timestamp() == 1592611200);
+	}
+
+	#[test]
+	fn days_since() {
+		assert!(Date::days_since(Date::new(1970, 1, 1).unwrap(), Date::new(1970, 1, 1).unwrap()) == 0);
+		assert!(Date::days_since(Date::new(1970, 1, 1).unwrap(), Date::new(1970, 1, 31).unwrap()) == 30);
+		assert!(Date::days_since(Date::new(1970, 1, 1).unwrap(), Date::new(2022, 4, 8).unwrap()) == 19090);
 	}
 
 	#[test]
