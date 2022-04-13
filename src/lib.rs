@@ -18,7 +18,7 @@
 //! ```
 //! use gregorian::{Date, Month::*, Year, YearMonth};
 //!
-//! assert!(Year::new(2020).has_leap_day(), "{}", true);
+//! assert!(Year::new(2020).has_leap_day());
 //! assert!(YearMonth::new(1900, February).total_days() == 28);
 //! assert!(YearMonth::new(2000, February).total_days() == 29);
 //!
