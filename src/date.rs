@@ -55,8 +55,16 @@ impl Date {
 		unsafe {
 			let time = libc::time(std::ptr::null_mut());
 			let mut tm: libc::tm = std::mem::zeroed();
+			#[cfg(not(target_os = "windows"))]
 			if libc::localtime_r(&time, &mut tm).is_null() {
-				panic!("failed to determine current time in local time zone");
+				panic!("failed to determine current time in local time zone: {}", std::io::Error::last_os_error());
+			}
+			#[cfg(target_os = "windows")]
+			{
+				let error = libc::localtime_s(&mut tm, &time);
+				if error != 0 {
+					panic!("failed to determine current time in local time zone: error {}", error);
+				}
 			}
 			let year = Year::new(tm.tm_year as i16 + 1900);
 			let month = Month::new_unchecked(tm.tm_mon as u8 + 1);

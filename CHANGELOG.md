@@ -1,3 +1,6 @@
+main:
+  * Fix `Date::today()` for Windows.
+
 Version 0.2.1:
   * Add `Date::today()` and `Date::today_utc()`.
 
