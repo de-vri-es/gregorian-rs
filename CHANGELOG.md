@@ -1,4 +1,4 @@
-main:
+Version 0.2.2 - 2022-05-24:
   * Fix `Date::today()` for Windows.
 
 Version 0.2.1:
