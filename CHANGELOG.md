@@ -1,8 +1,9 @@
 Version 0.2.3 - 2022-05-24:
   * Tweak signature of `Date::days_since()`.
 
-Version 0.2.2 - 2022-05-24:
+Version 0.2.2 - 2022-05-24 (YANKED):
   * Fix `Date::today()` for Windows.
+  * Add `date.days_since(other)` to compute difference between dates in days.
 
 Version 0.2.1 - 2021-01-24:
   * Add `Date::today()` and `Date::today_utc()`.
