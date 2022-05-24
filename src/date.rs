@@ -292,8 +292,8 @@ impl Date {
 	///
 	/// This does not include the end date.
 	/// For example, difference between the same date will be 0.
-	pub const fn days_since(date_1: Date, date_2: Date) -> i32 {
-		return date_2.days_since_year_zero() - date_1.days_since_year_zero();
+	pub const fn days_since(self, other: Date) -> i32 {
+		other.days_since_year_zero() - self.days_since_year_zero()
 	}
 }
 
@@ -574,9 +574,9 @@ mod test {
 
 	#[test]
 	fn days_since() {
-		assert!(Date::days_since(Date::new(1970, 1, 1).unwrap(), Date::new(1970, 1, 1).unwrap()) == 0);
-		assert!(Date::days_since(Date::new(1970, 1, 1).unwrap(), Date::new(1970, 1, 31).unwrap()) == 30);
-		assert!(Date::days_since(Date::new(1970, 1, 1).unwrap(), Date::new(2022, 4, 8).unwrap()) == 19090);
+		assert!(Date::new(1970, 1, 1).unwrap().days_since(Date::new(1970, 1, 1).unwrap()) == 0);
+		assert!(Date::new(1970, 1, 1).unwrap().days_since(Date::new(1970, 1, 31).unwrap()) == 30);
+		assert!(Date::new(1970, 1, 1).unwrap().days_since(Date::new(2022, 4, 8).unwrap()) == 19090);
 	}
 
 	#[test]

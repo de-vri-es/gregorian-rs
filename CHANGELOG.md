@@ -1,3 +1,6 @@
+main:
+  * Tweak signature of `Date::days_since()`.
+
 Version 0.2.2 - 2022-05-24:
   * Fix `Date::today()` for Windows.
 
