@@ -7,6 +7,11 @@ pub const MONTHS: [Month; 12] = [
 
 /// A month on the Gregorian calendar.
 #[repr(u8)]
+#[cfg_attr(
+	feature = "serde",
+	derive(serde::Serialize, serde::Deserialize),
+	serde(try_from = "u8", into = "u8")
+)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum Month {
 	January = 1,

@@ -17,6 +17,21 @@ pub struct Date {
 	pub(crate) day: u8,
 }
 
+#[cfg(feature = "serde")]
+impl serde::Serialize for Date {
+	fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+		serializer.collect_str(self)
+	}
+}
+
+#[cfg(feature = "serde")]
+impl<'a> serde::Deserialize<'a> for Date {
+	fn deserialize<D: serde::Deserializer<'a>>(deserializer: D) -> Result<Self, D::Error> {
+		let raw = std::borrow::Cow::<'_, str>::deserialize(deserializer)?;
+		raw.parse().map_err(serde::de::Error::custom)
+	}
+}
+
 impl Date {
 	/// Create a new date from a year, month and day.
 	///

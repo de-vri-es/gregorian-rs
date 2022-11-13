@@ -2,6 +2,7 @@ use crate::{Date, InvalidDayOfMonth, Month, Year};
 
 /// A month of a specific year.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct YearMonth {
 	year: Year,
 	month: Month,

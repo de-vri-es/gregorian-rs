@@ -16,9 +16,11 @@ edition = "2018"
 [features]
 default = ["std"]
 std = ["libc"]
+serde = ["dep:serde"]
 
 [dependencies]
 libc = { version = "0.2.82", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
 assert2 = "0.3.3"
