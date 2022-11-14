@@ -347,7 +347,7 @@ impl core::fmt::Debug for Date {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use assert2::assert;
+	use assert2::{assert, let_assert};
 
 	#[test]
 	fn new() {
@@ -601,5 +601,24 @@ mod test {
 	fn format() {
 		assert!(format!("{}", Date::new(2020, Month::January, 2).unwrap()) == "2020-01-02");
 		assert!(format!("{:?}", Date::new(2020, Month::January, 2).unwrap()) == "Date(2020-01-02)");
+	}
+
+	#[test]
+	fn serde() {
+		#[derive(Debug, serde::Deserialize, serde::Serialize)]
+		struct Container {
+			date: Date,
+		}
+
+		let_assert!(Ok(serialized) = serde_yaml::to_string(&Container {
+			date: Date::new(2020, Month::January, 2).unwrap(),
+		}));
+
+		assert!(serialized == "date: 2020-01-02\n");
+		let_assert!(Ok(parsed) = serde_yaml::from_str::<Container>("date: 2020-01-02"));
+		assert!(parsed.date == Date::new(2020, Month::January, 2).unwrap());
+
+		let_assert!(Err(e) = serde_yaml::from_str::<Container>("date: 2021-02-29"));
+		assert!(e.to_string() == "invalid day for February 2021: expected 1-28, got 29");
 	}
 }

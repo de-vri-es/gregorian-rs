@@ -11,7 +11,7 @@ description = "easy to use date library"
 keywords = ["date", "calendar", "gregorian", "proleptic"]
 categories = ["date-and-time", "no-std"]
 
-edition = "2018"
+edition = "2021"
 
 [features]
 default = ["std"]
@@ -24,3 +24,5 @@ serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
 assert2 = "0.3.3"
+gregorian = { path = ".", features = ["serde"] }
+serde_yaml = "0.9.14"

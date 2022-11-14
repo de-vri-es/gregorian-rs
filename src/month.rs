@@ -149,7 +149,7 @@ impl core::fmt::Display for Month {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use assert2::assert;
+	use assert2::{assert, let_assert};
 
 	#[test]
 	fn to_number() {
@@ -250,5 +250,56 @@ mod test {
 	fn format() {
 		assert!(format!("{}", January) == "January");
 		assert!(format!("{:?}", January) == "January");
+	}
+
+	#[test]
+	fn serde() {
+		#[derive(Debug, serde::Deserialize, serde::Serialize)]
+		struct Container {
+			month: Month,
+		}
+
+		#[track_caller]
+		fn serialize(month: Month) -> String {
+			let_assert!(Ok(serialized) = serde_yaml::to_string(&Container { month }));
+			serialized
+		}
+
+		#[track_caller]
+		fn deserialize(data: &str) -> Month {
+			let_assert!(Ok(deserialized) = serde_yaml::from_str::<Container>(data));
+			deserialized.month
+		}
+
+		assert!(serialize(Month::January) == "month: 1\n");
+		assert!(serialize(Month::February) == "month: 2\n");
+		assert!(serialize(Month::March) == "month: 3\n");
+		assert!(serialize(Month::April) == "month: 4\n");
+		assert!(serialize(Month::May) == "month: 5\n");
+		assert!(serialize(Month::June) == "month: 6\n");
+		assert!(serialize(Month::July) == "month: 7\n");
+		assert!(serialize(Month::August) == "month: 8\n");
+		assert!(serialize(Month::September) == "month: 9\n");
+		assert!(serialize(Month::October) == "month: 10\n");
+		assert!(serialize(Month::November) == "month: 11\n");
+		assert!(serialize(Month::December) == "month: 12\n");
+
+		assert!(deserialize("month: 1\n") == Month::January);
+		assert!(deserialize("month: 2\n") == Month::February);
+		assert!(deserialize("month: 3\n") == Month::March);
+		assert!(deserialize("month: 4\n") == Month::April);
+		assert!(deserialize("month: 5\n") == Month::May);
+		assert!(deserialize("month: 6\n") == Month::June);
+		assert!(deserialize("month: 7\n") == Month::July);
+		assert!(deserialize("month: 8\n") == Month::August);
+		assert!(deserialize("month: 9\n") == Month::September);
+		assert!(deserialize("month: 10\n") == Month::October);
+		assert!(deserialize("month: 11\n") == Month::November);
+		assert!(deserialize("month: 12\n") == Month::December);
+
+		let_assert!(Err(e) = serde_yaml::from_str::<Container>("month: 0"));
+		assert!(e.to_string() == "invalid month number: expected 1-12, got 0");
+		let_assert!(Err(e) = serde_yaml::from_str::<Container>("month: 13"));
+		assert!(e.to_string() == "invalid month number: expected 1-12, got 13");
 	}
 }

@@ -154,7 +154,7 @@ impl core::fmt::Debug for YearMonth {
 #[cfg(test)]
 mod test {
 	use crate::*;
-	use assert2::assert;
+	use assert2::{assert, let_assert};
 
 	#[test]
 	fn add_months() {
@@ -234,5 +234,15 @@ mod test {
 	fn format() {
 		assert!(format!("{}", Year::new(2020).with_month(January)) == "2020-01");
 		assert!(format!("{:?}", Year::new(2020).with_month(January)) == "YearMonth(2020-01)");
+	}
+
+	#[test]
+	fn serde() {
+		let_assert!(Ok(serialized) = serde_yaml::to_string(&YearMonth::new(2020, Month::January)));
+		assert!(serialized == "year: 2020\nmonth: 1\n");
+
+		let_assert!(Ok(parsed) = serde_yaml::from_str::<YearMonth>("year: 2020\nmonth: 1\n"));
+		assert!(parsed.year == 2020);
+		assert!(parsed.month == Month::January);
 	}
 }

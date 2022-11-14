@@ -181,7 +181,7 @@ impl core::fmt::Debug for Year {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use assert2::assert;
+	use assert2::{assert, let_assert};
 
 	#[test]
 	fn has_leap_day() {
@@ -234,5 +234,21 @@ mod test {
 	fn format_year() {
 		assert!(format!("{}", Year::new(2020)) == "2020");
 		assert!(format!("{:?}", Year::new(2020)) == "Year(2020)");
+	}
+
+	#[test]
+	fn serde() {
+		#[derive(Debug, serde::Deserialize, serde::Serialize)]
+		struct Container {
+			year: Year,
+		}
+
+		let_assert!(Ok(serialized) = serde_yaml::to_string(&Container {
+			year: Year::new(2020),
+		}));
+
+		assert!(serialized == "year: 2020\n");
+		let_assert!(Ok(parsed) = serde_yaml::from_str::<Container>("year: 2020"));
+		assert!(parsed.year == Year::new(2020));
 	}
 }
