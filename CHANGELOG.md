@@ -1,3 +1,6 @@
+Unreleased:
+  * Add optional `serde` support.
+
 Version 0.2.3 - 2022-05-24:
   * Tweak signature of `Date::days_since()`.
 
