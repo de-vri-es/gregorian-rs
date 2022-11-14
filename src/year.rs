@@ -4,6 +4,7 @@ use crate::{Date, InvalidDayOfYear, Month, YearMonth};
 ///
 /// All dates in the library use the proleptic Gregorian calendar with a year 0.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
 pub struct Year {
 	year: i16,
 }
