@@ -166,6 +166,33 @@ impl core::ops::SubAssign<i16> for Year {
 	}
 }
 
+impl core::ops::Add<Year> for Year {
+	type Output = Self;
+
+	fn add(self, other: Year) -> Self {
+		Self::new(self.to_number() + other.to_number())
+	}
+}
+
+impl core::ops::Sub<Year> for Year {
+	type Output = Self;
+
+	fn sub(self, other: Year) -> Self {
+		Self::new(self.to_number() - other.to_number())
+	}
+}
+
+impl core::ops::AddAssign<Year> for Year {
+	fn add_assign(&mut self, other: Year) {
+		self.year += other.to_number()
+	}
+}
+
+impl core::ops::SubAssign<Year> for Year {
+	fn sub_assign(&mut self, other: Year) {
+		self.year -= other.to_number()
+	}
+}
 impl core::fmt::Display for Year {
 	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "{:04}", self.year)
@@ -227,6 +254,23 @@ mod test {
 		assert!(months[9] == year.with_month(Month::October));
 		assert!(months[10] == year.with_month(Month::November));
 		assert!(months[11] == year.with_month(Month::December));
+	}
+
+	#[test]
+	fn maths(){
+		assert!(Year::new(2020) + Year::new(2) == Year::new(2022));
+		assert!(Year::new(2020) - Year::new(2) == Year::new(2018));
+		
+		let mut year = Year::new(2020);
+		let add_two = Year::new(2);
+		year += add_two;
+		assert!(year == Year::new(2022));
+
+
+		let mut year = Year::new(2020);
+		let sub_two = Year::new(2);
+		year -= sub_two;
+		assert!(year == Year::new(2018));
 	}
 
 	#[test]
